@@ -1,5 +1,5 @@
 import { QuestionRequest, QuestionType, Questions } from '@/types/questions';
-import { isValidBody } from '@/util/typescript_helpers';
+import { isValidBody } from '@/utils/typescript_helpers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 function get_questions(type: QuestionType): [string, string[]][] {
