@@ -2,9 +2,9 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
-import firebase from '/firebase/initFirebase.js';
-import WriteToCloudFirestore from '/components/cloudFirestore/Write.js';
-import ReadToCloudFirestore from '/components/cloudFirestore/Read.js';
+import firebase from '@/firebase/initFirebase.js';
+import WriteToCloudFirestore from '@/components/cloudFirestore/Write.js';
+import ReadToCloudFirestore from '@/components/cloudFirestore/Read.js';
 firebase();
 const inter = Inter({ subsets: ['latin'] });
 
