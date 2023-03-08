@@ -13,7 +13,7 @@ function get_questions(type: QuestionType): [string, string[]][] {
   }
 }
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Questions>
 ) {
