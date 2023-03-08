@@ -1,4 +1,4 @@
-function isValidBody<T extends Record<string, unknown>>(
+export function isValidBody<T extends Record<string, unknown>>(
   body: unknown,
   fields: (keyof T)[]
 ): body is T {

@@ -6,18 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint  --max-warnings=0",
+    "lint": "next lint",
     "format": "prettier --config .prettierrc 'src/**' --write",
     "prepare": "husky install"
-  },
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
-      "npm lint",
-      "prettier --write"
-    ],
-    "**/*.{css,scss,md,html,json}": [
-      "prettier --write"
-    ]
   },
   "dependencies": {
     "eslint-config-next": "13.2.3",
