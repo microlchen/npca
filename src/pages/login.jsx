@@ -73,12 +73,12 @@ export default function login() {
                         <Grid item xs={12}>
                             <FormControlLabel
                                 control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                label={<Typography fontSize="medium" color="black">I accept the &nbsp;
+                                label={<Typography fontSize="medium" color="black">I accept the 
                                     <Link href="./login" >
                                         {'Terms of Service'}
-                                    </Link> &nbsp;and the&nbsp; <Link href="./login" >
+                                    </Link> and the <Link href="./login" >
                                         {'Privacy Policy'}
-                                    </Link> &nbsp;of this page.</Typography>}
+                                    </Link> of this page.</Typography>}
                             />
                         </Grid>
                     </Grid>
