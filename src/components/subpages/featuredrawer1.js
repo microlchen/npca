@@ -19,7 +19,6 @@ const Featuredrawer1 = () => {
                     <VideocamIcon />
             </div>
 
-
             <div className={styles.questionheading}>Over the last 2 weeks, how often have you been bothered
                 by any of the following problems?</div>
 

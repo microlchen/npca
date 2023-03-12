@@ -47,12 +47,17 @@ const Toolbars = () => {
                 }}
             >
 
-                <Box sx={{ mt: 3 }}>
+                <Box sx={{ mt: 3, ml: 2 }}>
+                    <div className={styles.toolbarspacingh}>
+                        <PersonIcon />
+                        <VideocamIcon />
+                    </div>
+                    <div className={styles.mainheading}>Form Templates
+
+                    </div>
                     <List sx={{ ml: 2 }}>
-                        <div className={styles.toolbarspacingh}>
-                            <PersonIcon />
-                            <VideocamIcon />
-                        </div>
+
+
                         <ListItem disablePadding sx={{ marginLeft: 2 }}>
                             <MenuIcon />
                             <div className={styles.horizontal_spacing}></div>
@@ -69,7 +74,7 @@ const Toolbars = () => {
                                     sx: {
                                         //marginTop: "100px",
                                         marginLeft: "50px",
-                                        backgroundColor:  "#2d698b",
+                                        backgroundColor: "#2d698b",
                                         color: "black",
                                         flexGrow: 1,
                                         width: "100%",
