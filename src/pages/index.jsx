@@ -76,7 +76,7 @@ export default function Home() {
               Patient Profiles <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
-              Track your patient's growth and wellness through our automated system over time!
+              Track your patient&apos;s growth and wellness through our automated system over time!
             </p>
           </a>
 
@@ -101,5 +101,5 @@ export default function Home() {
         <ReadToCloudFirestore />
       </main>
     </div>
-  );
+  )
 }
