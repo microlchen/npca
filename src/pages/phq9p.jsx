@@ -16,31 +16,31 @@ const patientform = () => {
     //make a hashmap
 
     const handleChange1 = (value) => {
-        q1answer = value;
+        
     }
     const handleChange2 = (value) => {
-        q1answer = value;
+        
     }
     const handleChange3 = (value) => {
-        q1answer = value;
+        
     }
     const handleChange4 = (value) => {
-        q1answer = value;
+        
     }
     const handleChange5 = (value) => {
-        q1answer = value;
+      
     }
     const handleChange6 = (value) => {
-        q1answer = value;
+       
     }
     const handleChange7 = (value) => {
-        q1answer = value;
+        
     }
     const handleChange8 = (value) => {
-        q1answer = value;
+        
     }
     const handleChange9 = (value) => {
-        q1answer = value;
+        
     }
 
     return (
