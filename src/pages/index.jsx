@@ -12,8 +12,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   return (
-    <>
-      
+    <div>
       <Toolbars />
       <main className={styles.main}>
 
@@ -54,7 +53,7 @@ export default function Home() {
           </a>
 
           <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+            href="./phq9p"
             className={styles.card}
             target="_blank"
             rel="noopener noreferrer"
@@ -101,6 +100,6 @@ export default function Home() {
         <WriteToCloudFirestore />
         <ReadToCloudFirestore />
       </main>
-    </>
+    </div>
   );
 }

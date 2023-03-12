@@ -37,9 +37,19 @@
   color: white;
   margin-top: 2%;
 }
+.questionheading2 {
+  font-size: xx-large;
+  font-weight: 600;
+  color: black;
+  margin-top: 2%;
+  margin-left: 1%;
+}
 .questions {
   font-size: x-large;
-  color: white;
+  color: black;
+  margin-top: 0.5%;
+  margin-bottom: 0.5%;
+  margin-left: 2%;
 }
 
 .appbar {

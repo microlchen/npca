@@ -75,9 +75,9 @@ export default function login() {
                                 control={<Checkbox value="allowExtraEmails" color="primary" />}
                                 label={<Typography fontSize="medium" color="black">I accept the &nbsp;
                                     <Link href="./login" >
-                                        Terms of Service
+                                        {'Terms of Service'}
                                     </Link> &nbsp;and the&nbsp; <Link href="./login" >
-                                        Privacy Policy
+                                        {'Privacy Policy'}
                                     </Link> &nbsp;of this page.</Typography>}
                             />
                         </Grid>
