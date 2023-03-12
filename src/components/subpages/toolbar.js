@@ -5,6 +5,8 @@ import { Link, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Drawe
 import Featuredrawer1 from './featuredrawer1';
 import MenuIcon from '@mui/icons-material/Menu';
 import { detectOverflow } from '@popperjs/core';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import PersonIcon from '@mui/icons-material/Person';
 
 const Toolbars = () => {
 
@@ -35,8 +37,9 @@ const Toolbars = () => {
 
                 PaperProps={{
                     sx: {
-                        marginTop: "100px",
-                        backgroundColor: "grey",
+                        //marginTop: "100px",
+                        marginLeft: "50px",
+                        backgroundColor: "#2d698b",
                         color: "white",
                         flexGrow: 1,
                         width: "100%"
@@ -46,12 +49,16 @@ const Toolbars = () => {
 
                 <Box sx={{ mt: 3 }}>
                     <List sx={{ ml: 2 }}>
+                        <div className={styles.toolbarspacingh}>
+                            <PersonIcon />
+                            <VideocamIcon />
+                        </div>
                         <ListItem disablePadding sx={{ marginLeft: 2 }}>
                             <MenuIcon />
                             <div className={styles.horizontal_spacing}></div>
                             <Link underline="hover" onClick={openfirstDrawer} sx={{ color: 'white' }} >
                                 <ListItemText primaryTypographyProps={{ sx: { fontSize: '24px', textTransform: 'none' } }}>
-                                    sJKklas </ListItemText>
+                                    PHQ - 9 </ListItemText>
                             </Link>
                             <Drawer
                                 anchor='left'
@@ -61,11 +68,12 @@ const Toolbars = () => {
                                 PaperProps={{
                                     sx: {
                                         //marginTop: "100px",
-                                        backgroundColor: "gray",
+                                        marginLeft: "50px",
+                                        backgroundColor:  "#2d698b",
                                         color: "black",
                                         flexGrow: 1,
-                                        width: "75%"
-                                        
+                                        width: "100%",
+                                        paddingRight: "60px"
                                     }
                                 }}
                             >
@@ -108,6 +116,10 @@ const Toolbars = () => {
 
                 </Box>
             </Drawer>
+            <div className={styles.toolbarspacingh}>
+                <PersonIcon />
+                <VideocamIcon />
+            </div>
         </Toolbar>
     )
 }

@@ -6,6 +6,7 @@ import firebase from '@/firebase/initFirebase.js';
 import WriteToCloudFirestore from '@/components/cloudFirestore/Write.js';
 import ReadToCloudFirestore from '@/components/cloudFirestore/Read.js';
 import Toolbars from '../components/subpages/toolbar'
+
 firebase();
 
 const inter = Inter({ subsets: ['latin'] });
@@ -21,26 +22,25 @@ export default function Home() {
       </Head>
       <Toolbars />
       <main className={styles.main}>
+
         <div className={styles.spacing}></div>
         <div className={styles.center}>
           <Image
             className={styles.logo}
-            src="/next.svg"
+            src="/npca.png"
             alt="Next.js Logo"
-            width={180}
-            height={37}
+            width={380}
+            height={167}
             priority
           />
           <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
+            Novel
+            Prediction
+            Computational
+            Analysis
           </div>
         </div>
+        <div> TeleHealth, ran by data.</div>
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
@@ -53,7 +53,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
+              Log In <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
               Find in-depth information about Next.js features and&nbsp;API.
@@ -67,7 +67,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
+              Forms and Calls <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
               Learn about Next.js in an interactive course with&nbsp;quizzes!
@@ -81,7 +81,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
+              Patient Profiles <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
               Discover and deploy boilerplate example Next.js&nbsp;projects.
@@ -95,11 +95,10 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
+              Privacy and HIPAA Policies <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
+              NPCA will not be liable for any misuse of data. Please familiarize yourself with your state laws and the Ferderal HIPAA regulations and obtain patient consent before using our services.
             </p>
           </a>
         </div>
