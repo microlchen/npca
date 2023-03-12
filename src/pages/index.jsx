@@ -26,7 +26,6 @@ export default function Home() {
         <div className={styles.spacing}></div>
         <div className={styles.center}>
           <Image
-            className={styles.logo}
             src="/npca.png"
             alt="Next.js Logo"
             width={380}
