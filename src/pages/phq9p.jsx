@@ -13,7 +13,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
 const patientform = () => {
-    //make a hashmap
+    /*make a hashmap
 
     const handleChange1 = (value) => {
         
@@ -42,6 +42,7 @@ const patientform = () => {
     const handleChange9 = (value) => {
         
     }
+    */
 
     return (
 
@@ -61,7 +62,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q1answer}
                         label="Answer"
-                        onChange={handleChange1}
+                        //onChange={handleChange1}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -78,7 +79,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q2answer}
                         label="Answer"
-                        onChange={handleChange2}
+                        //onChange={handleChange2}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -94,7 +95,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q3answer}
                         label="Answer"
-                        onChange={handleChange3}
+                        //onChange={handleChange3}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -111,7 +112,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q4answer}
                         label="Answer"
-                        onChange={handleChange4}
+                        //onChange={handleChange4}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -129,7 +130,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q5answer}
                         label="Answer"
-                        onChange={handleChange5}
+                        //onChange={handleChange5}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -147,7 +148,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q6answer}
                         label="Answer"
-                        onChange={handleChange6}
+                        //onChange={handleChange6}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -165,7 +166,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q7answer}
                         label="Answer"
-                        onChange={handleChange7}
+                        //onChange={handleChange7}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -184,7 +185,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q8answer}
                         label="Answer"
-                        onChange={handleChange8}
+                        //onChange={handleChange8}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
@@ -202,7 +203,7 @@ const patientform = () => {
                         id="demo-simple-select"
                         //value={q9answer}
                         label="Answer"
-                        onChange={handleChange9}
+                        //onChange={handleChange9}
                     >
                         <MenuItem value={0}>0 - Not at all</MenuItem>
                         <MenuItem value={1}>1 - Several days</MenuItem>
