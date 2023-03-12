@@ -21,6 +21,16 @@ describe('/api/questions API Endpoint', () => {
     return { req, res };
   }
 
+  it('should return a successful response from phq9 questions', async () => {
+    const { req, res } = mockRequestResponse(QuestionType.PHQ9);
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.getHeaders()).toEqual({ 'content-type': 'application/json' });
+    expect(res.statusMessage).toEqual('OK');
+    expect(res.json);
+  });
+
   it('should return a successful response from questions', async () => {
     const { req, res } = mockRequestResponse(QuestionType.PHQ9);
     await handler(req, res);

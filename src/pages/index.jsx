@@ -1,12 +1,7 @@
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
-import firebase from '@/firebase/initFirebase.js';
-import WriteToCloudFirestore from '@/components/cloudFirestore/Write.js';
-import ReadToCloudFirestore from '@/components/cloudFirestore/Read.js';
-import Toolbars from '../components/subpages/toolbar'
-
-firebase();
+import Toolbars from '../components/subpages/toolbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,7 +10,6 @@ export default function Home() {
     <div>
       <Toolbars />
       <main className={styles.main}>
-
         <div className={styles.spacing}></div>
         <div className={styles.center}>
           <Image
@@ -26,10 +20,7 @@ export default function Home() {
             priority
           />
           <div className={styles.thirteen}>
-            Novel
-            Prediction
-            Computational
-            Analysis
+            Novel Prediction Computational Analysis
           </div>
         </div>
         <div> TeleHealth, ran by data.</div>
@@ -62,7 +53,8 @@ export default function Home() {
               Forms and Calls <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
-              Video calling, data collecting, and form filling - all in one platform!
+              Video calling, data collecting, and form filling - all in one
+              platform!
             </p>
           </a>
 
@@ -76,7 +68,8 @@ export default function Home() {
               Patient Profiles <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
-              Track your patient&apos;s growth and wellness through our automated system over time!
+              Track your patient&apos;s growth and wellness through our
+              automated system over time!
             </p>
           </a>
 
@@ -90,16 +83,16 @@ export default function Home() {
               Privacy and HIPAA Policies <span>-&gt;</span>
             </h2>
             <p className={inter.className}>
-              NPCA will not be liable for any misuse of data. Please familiarize yourself with your state laws and Ferderal HIPAA regulations and obtain patient consent before using our services.
+              NPCA will not be liable for any misuse of data. Please familiarize
+              yourself with your state laws and Ferderal HIPAA regulations and
+              obtain patient consent before using our services.
             </p>
           </a>
         </div>
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
-        <WriteToCloudFirestore />
-        <ReadToCloudFirestore />
       </main>
     </div>
-  )
+  );
 }
