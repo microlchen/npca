@@ -1,3 +1,4 @@
+import { app } from '@/firebase/initFirebase';
 import { KeyedQuestionSet, Question, QuestionSet } from '@/types/questions';
 import {
   addDoc,
@@ -14,7 +15,7 @@ const generic_questions_id = 'generic_questions';
 
 export async function create_question_set(name: string, questions: Question[]) {
   try {
-    const db = getFirestore();
+    const db = getFirestore(app);
     const question_collection_index = collection(
       db,
       generic_questions_index_id
@@ -34,7 +35,7 @@ export async function create_question_set(name: string, questions: Question[]) {
 export async function get_generic_question_types(): Promise<
   { id: string; name: string }[]
 > {
-  const db = getFirestore();
+  const db = getFirestore(app);
   const question_collection_index = collection(db, generic_questions_index_id);
   const all_docs = await getDocs(question_collection_index);
   const question_types = all_docs.docs.map((snapshot) => {
@@ -47,7 +48,7 @@ export async function get_generic_question_types(): Promise<
 }
 
 export async function get_question_set(id: string): Promise<KeyedQuestionSet> {
-  const db = getFirestore();
+  const db = getFirestore(app);
 
   const question_collection = collection(db, generic_questions_id);
 

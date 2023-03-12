@@ -1,8 +1,6 @@
 import styles from '@/styles/Home.module.css';
 import * as React from 'react';
 import { Button, Box } from '@mui/material/';
-import WriteToCloudFirestore from '@/components/cloudFirestore/Write.js';
-import ReadToCloudFirestore from '@/components/cloudFirestore/Read.js';
 import VideocamIcon from '@mui/icons-material/Videocam';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -69,8 +67,6 @@ const PatientForm = ({ questions }) => {
         ))}
         <Box sx={{ display: 'flex', justifyContent: 'center', marginLeft: -7 }}>
           <Button className={styles.submit}>Submit</Button>
-          <WriteToCloudFirestore />
-          <ReadToCloudFirestore />
         </Box>
       </Box>
     </Box>

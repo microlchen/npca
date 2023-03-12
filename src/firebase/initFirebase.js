@@ -1,4 +1,4 @@
-import { getApps, initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getPerformance } from 'firebase/performance';
 
@@ -12,16 +12,16 @@ const clientCredentials = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-export default function initFirebase() {
-  if (!getApps().length) {
-    // Does it matter that the return values are thrown away?
-    initializeApp(clientCredentials);
-    if (typeof window !== 'undefined') {
-      if ('measurementId' in clientCredentials) {
-        getAnalytics();
-        getPerformance();
-      }
+if (!getApps().length) {
+  // Does it matter that the return values are thrown away?
+  initializeApp(clientCredentials);
+  if (typeof window !== 'undefined') {
+    if ('measurementId' in clientCredentials) {
+      getAnalytics();
+      getPerformance();
     }
-    console.log('Firebase was successfully init.');
   }
+  console.log('Firebase was successfully init.');
 }
+const app = getApp();
+export { app };

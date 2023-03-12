@@ -12,6 +12,5 @@ export default function App({ Component, pageProps }) {
       </Head>
       <Component {...pageProps} />
     </div>
-
-  )
+  );
 }
