@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
 import Toolbars from '../components/subpages/toolbar';
+import Dashboard from './patientportal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -58,20 +59,7 @@ export default function Home() {
             </p>
           </a>
 
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Patient Profiles <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Track your patient&apos;s growth and wellness through our
-              automated system over time!
-            </p>
-          </a>
+          <Dashboard />
 
           <a
             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
@@ -92,6 +80,7 @@ export default function Home() {
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
+        
       </main>
     </div>
   );

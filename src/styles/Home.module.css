@@ -70,6 +70,12 @@
   width: var(--max-width);
   max-width: 100%;
 }
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(25%, auto));
+  width: 400%;
+  max-width: 400%;
+}
 
 .card {
   padding: 1rem 1rem;
