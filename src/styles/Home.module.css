@@ -5,6 +5,7 @@
   align-items: center;
   padding: 6rem;
   min-height: 100vh;
+  background-color: #00081a;
 }
 .spacing {
   margin-top: var(--toolbar-spacing);
@@ -80,7 +81,7 @@
 .card {
   padding: 1rem 1rem;
   border-radius: var(--border-radius);
-  background: rgba(52, 73, 121, 0.5);
+  background: #364566;
   margin-right: 2%;
   margin-left: 2%;
   

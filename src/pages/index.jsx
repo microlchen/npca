@@ -1,10 +1,11 @@
 import Image from 'next/image';
-import { Inter } from 'next/font/google';
+{/*import { Inter } from 'next/font/google';*/}
+import { Georama } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
 import Toolbars from '../components/subpages/toolbar';
 import Dashboard from './patientportal';
 
-const inter = Inter({ subsets: ['latin'] });
+const geo = Georama({ subsets: ['latin'] });
 
 export default function Home() {
   return (
@@ -24,7 +25,10 @@ export default function Home() {
             Novel Prediction Computational Analysis
           </div>
         </div>
-        <div> TeleHealth, run by data.</div>
+        <div className={styles.thirteen}>
+          Telehealth, run by data.
+          </div>
+        
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
@@ -36,10 +40,10 @@ export default function Home() {
             //target="_blank"
             rel="noopener noreferrer"
           >
-            <h2 className={inter.className}>
+            <h2 className={geo.className}>
               Log In <span>-&gt;</span>
             </h2>
-            <p className={inter.className}>
+            <p className={geo.className}>
               Sign up and log in today to improve your workflow!
             </p>
           </a>
@@ -50,10 +54,10 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <h2 className={inter.className}>
+            <h2 className={geo.className}>
               Forms and Calls <span>-&gt;</span>
             </h2>
-            <p className={inter.className}>
+            <p className={geo.className}>
               Video calling, data collecting, and form filling - all in one
               platform!
             </p>
@@ -67,10 +71,10 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <h2 className={inter.className}>
+            <h2 className={geo.className}>
               Privacy and HIPAA Policies <span>-&gt;</span>
             </h2>
-            <p className={inter.className}>
+            <p className={geo.className}>
               NPCA will not be liable for any misuse of data. Please familiarize
               yourself with your state laws and Ferderal HIPAA regulations and
               obtain patient consent before using our services.
