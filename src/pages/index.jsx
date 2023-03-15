@@ -1,13 +1,21 @@
 import Image from 'next/image';
-{/*import { Inter } from 'next/font/google';*/}
 import { Georama } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
 import Toolbars from '../components/subpages/toolbar';
 import Dashboard from './patientportal';
 
+import { useRouter } from 'next/router';
+import { useCallback } from 'react';
+import { Button } from '@mui/material';
+
 const geo = Georama({ subsets: ['latin'] });
 
 export default function Home() {
+  const router = useRouter();
+  const onLogin = useCallback(() => {
+    router.push('/login');
+  }, [router]);
+
   return (
     <div>
       <Toolbars />
@@ -25,28 +33,20 @@ export default function Home() {
             Novel Prediction Computational Analysis
           </div>
         </div>
-        <div className={styles.thirteen}>
-          Telehealth, run by data.
-          </div>
-        
+        <div className={styles.thirteen}>Telehealth, run by data.</div>
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
 
         <div className={styles.grid}>
-          <a
-            href="./login"
-            className={styles.card}
-            //target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Button onClick={onLogin} className={styles.card}>
             <h2 className={geo.className}>
               Log In <span>-&gt;</span>
             </h2>
             <p className={geo.className}>
               Sign up and log in today to improve your workflow!
             </p>
-          </a>
+          </Button>
 
           <a
             href="./phq9p"
@@ -84,7 +84,6 @@ export default function Home() {
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
-        
       </main>
     </div>
   );
