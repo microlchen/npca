@@ -34,7 +34,7 @@ export function useSignUpWithEmailAndPassword() {
         setError(error as FirebaseError);
       }
     },
-    [auth, setData, setError, setLoading]
+    [auth, db, setData, setError, setLoading]
   );
 
   return [signUp, state] as [typeof signUp, typeof state];

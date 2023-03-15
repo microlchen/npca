@@ -50,7 +50,6 @@ export default function Login() {
       }
 
       const data = new FormData(form.current);
-      console.log(data);
       const email = data.get('email') as string;
       const password = data.get('password') as string;
 
