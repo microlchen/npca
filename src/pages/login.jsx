@@ -1,9 +1,40 @@
-
 import { Divider, Typography, Box, Grid, TextField, FormControlLabel, Checkbox, Button, Link } from "@mui/material/";
 import styles from '@/styles/Home.module.css';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
+import { app } from '@/firebase/initFirebase';
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+import React, { useState } from 'react'
+import { create_user_set } from '@/data/user';
 
 export default function login() {
+    const auth = getAuth(app)
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
 
+    // signup 
+    const signup = async() => {
+            createUserWithEmailAndPassword(auth, email, password).then(cred=>{
+                console.log(cred)
+                setEmail("")
+                setPassword("")
+            })
+            create_user_set(email, password).catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+            });
+    }
+
+    //
+    const track_auth_status = async() => {
+        onAuthStateChanged(auth, user => { 
+            if (user) {
+                console.log(user, "logged in");
+            } else {
+                console.log("logged out");
+            }
+        });
+    }
     return (
 
 
@@ -26,15 +57,15 @@ export default function login() {
                 flexDirection: 'row',
             }}>
 
-               
 
-                    <img
-                        sx={{ mt: 5, flexGrow: 1, objectFit: "contain", alignItems: "end" }}
-                        component="img"
-                        height="100"
-                        src="/npca.png"
 
-                    />
+                <img
+                    sx={{ mt: 5, flexGrow: 1, objectFit: "contain", alignItems: "end" }}
+                    component="img"
+                    height="100"
+                    src="/npca.png"
+
+                />
 
             </Box>
 
@@ -57,6 +88,12 @@ export default function login() {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
+                                value={email}
+                                onChange={(event) => {
+                                    setEmail(event.target.value);
+                                    // setEmail("test");
+
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -68,6 +105,10 @@ export default function login() {
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
+                                value={password}
+                                onChange={(event) => {
+                                    setPassword(event.target.value);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -83,23 +124,19 @@ export default function login() {
                         </Grid>
                     </Grid>
                     <Button
-                        type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        href="./login"
+                        onClick={signup}
                     >
                         Sign Up
                     </Button>
 
                     <Divider sx={{ height: 0.1, width: 1, backgroundColor: "background.main" }} />
                     <Button
-                        //onClick={() => signIn()}
-                        type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        href="./login"
                     >
                         Create an Account
                     </Button>
@@ -112,8 +149,9 @@ export default function login() {
                         }}></Box>
                 </Box>
             </Box>
-
+            
         </Box>
 
     )
 }
+
