@@ -1,8 +1,5 @@
 import '@/styles/globals.css';
 import Head from 'next/head';
-import initAuth from '@/firebase/initAuth.js' // the module you created above
-
-initAuth()
 
 export default function App({ Component, pageProps }) {
   return (
