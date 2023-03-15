@@ -35,4 +35,5 @@ yarn-error.log*
 .vscode
 
 # secrets
-# serviceAccountKey.json
+.env
+

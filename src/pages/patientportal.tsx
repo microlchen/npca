@@ -14,10 +14,11 @@ import GuardedPage from '@/components/GuardedPage';
 import styles from '@/styles/Home.module.css';
 import { useAuth } from 'reactfire';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { adminSDK } from '@/firebase/initFirebaseAdmin';
+import { getAdminSDK } from '@/firebase/initFirebaseAdmin';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const cookies = nookies.get(ctx);
+  const adminSDK = getAdminSDK();
   if (!cookies.token) {
     return {
       props: {
@@ -69,7 +70,15 @@ function Dashboard({
     setAnchorDrawer(null);
   };
 
-  const [patientNames, setPatientNames] = useState(['Test One', 'Test 2', "Make", 'Each', 'button', 'a unique link', 'individualpatient.jsx will take on textfields from database']);
+  const [patientNames, setPatientNames] = useState([
+    'Test One',
+    'Test 2',
+    'Make',
+    'Each',
+    'button',
+    'a unique link',
+    'individualpatient.jsx will take on textfields from database'
+  ]);
 
   /*useEffect(() => {
         // Get the hashmap of patients from an API
@@ -117,37 +126,43 @@ function Dashboard({
           }}
         >
           <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
-            <Box sx={{mt: "1%"}}></Box>
+            <Box sx={{ mt: '1%' }}></Box>
             <h1 className={styles.mainheading}>Dashboard</h1>
-            <Box sx={{mt: "0.5%", mb: '1%'}}><Button href='./individualpatient' sx ={{backgroundColor:'#34497980', color: 'white'}}>Add New Patient</Button></Box>
+            <Box sx={{ mt: '0.5%', mb: '1%' }}>
+              <Button
+                href="./individualpatient"
+                sx={{ backgroundColor: '#34497980', color: 'white' }}
+              >
+                Add New Patient
+              </Button>
+            </Box>
             <Autocomplete
-                
-                multiple
-                id="Searchbar"
-                options={patientNames}
-                
-                filterSelectedOptions
-                renderInput={(params) => (
+              multiple
+              id="Searchbar"
+              options={patientNames}
+              filterSelectedOptions
+              renderInput={(params) => (
                 <TextField
-                    sx = {{backgroundColor:"white", borderRadius: 25}}
-                    {...params}
-                    label="Search for Patients"
-                    placeholder="Enter Patient Name"
-                    
-                    
+                  sx={{ backgroundColor: 'white', borderRadius: 25 }}
+                  {...params}
+                  label="Search for Patients"
+                  placeholder="Enter Patient Name"
                 />
-                
-                )}
-                
-                
-                sx={{ flexGrow:7, }}
+              )}
+              sx={{ flexGrow: 7 }}
             />
-             <Box sx={{mb: "2%"}}></Box>
+            <Box sx={{ mb: '2%' }}></Box>
             <ul>
               {patientNames.map((patientName) => (
-                <ListItemButton sx={{backgroundColor:'#34497980', borderRadius: 50, mt: "1%"}} key={patientName}>
+                <ListItemButton
+                  sx={{
+                    backgroundColor: '#34497980',
+                    borderRadius: 50,
+                    mt: '1%'
+                  }}
+                  key={patientName}
+                >
                   {patientName}
-                  
                 </ListItemButton>
               ))}
             </ul>
