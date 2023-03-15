@@ -11,18 +11,19 @@ export default function login() {
     const auth = getAuth(app)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-
+    // const [uid, setuid] = useState("")
     // signup 
     const signup = async() => {
             createUserWithEmailAndPassword(auth, email, password).then(cred=>{
                 console.log(cred)
+                create_user_set(email, cred.user.uid).catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                });
                 setEmail("")
                 setPassword("")
             })
-            create_user_set(email, password).catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-            });
+            
     }
 
     //
@@ -30,8 +31,11 @@ export default function login() {
         onAuthStateChanged(auth, user => { 
             if (user) {
                 console.log(user, "logged in");
+                setEmail("loggedin")
             } else {
                 console.log("logged out");
+                setEmail("loggedout")
+
             }
         });
     }
@@ -154,4 +158,5 @@ export default function login() {
 
     )
 }
+
 
