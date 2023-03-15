@@ -24,7 +24,7 @@ export default function Home() {
             Novel Prediction Computational Analysis
           </div>
         </div>
-        <div> TeleHealth, ran by data.</div>
+        <div> TeleHealth, run by data.</div>
 
         <div className={styles.spacing}></div>
         <div className={styles.spacing}></div>
