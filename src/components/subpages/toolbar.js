@@ -14,9 +14,6 @@ import {
 } from '@mui/material/';
 import Featuredrawer1 from './featuredrawer1';
 import MenuIcon from '@mui/icons-material/Menu';
-import { detectOverflow } from '@popperjs/core';
-import VideocamIcon from '@mui/icons-material/Videocam';
-import PersonIcon from '@mui/icons-material/Person';
 
 const Toolbars = () => {
   const [anchorDrawer, setAnchorDrawer] = useState(null);

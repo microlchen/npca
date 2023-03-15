@@ -77,13 +77,15 @@ export default function Login() {
         marginBottom: '5%'
       }}
     >
-      <Image
-        src="/npca.png"
-        alt="Next.js Logo"
-        width={380}
-        height={167}
-        priority
-      />
+      <Box sx={{ mt: '7%' }}>
+        <Image
+          src="/npca.png"
+          alt="Next.js Logo"
+          width={380}
+          height={167}
+          priority
+        />
+      </Box>
 
       <Box
         sx={{
@@ -156,6 +158,7 @@ export default function Login() {
             type="submit"
             name="action"
             value="up"
+            href="./dashboard"
             onClick={() => onSubmit(Submitter.SignUp)}
           >
             Sign Up

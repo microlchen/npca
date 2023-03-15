@@ -2,15 +2,12 @@ import * as React from 'react';
 import nookies from 'nookies';
 import { Inter } from 'next/font/google';
 import {
-  Link,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  ListItemIcon,
+  
   Drawer,
-  Button,
-  Box
+  TextField,
+  Autocomplete,
+  Box,
+  ListItemButton
 } from '@mui/material/';
 import { useState } from 'react';
 import GuardedPage from '@/components/GuardedPage';
@@ -72,7 +69,7 @@ function Dashboard({
     setAnchorDrawer(null);
   };
 
-  const [patientNames, setPatientNames] = useState(['Test One', 'Test 2']);
+  const [patientNames, setPatientNames] = useState(['Test One', 'Test 2', "Make", 'Each', 'button', 'a unique link', 'individualpatient.jsx will take on textfields from database']);
 
   /*useEffect(() => {
         // Get the hashmap of patients from an API
@@ -119,14 +116,39 @@ function Dashboard({
             }
           }}
         >
-          <Box sx={{ ml: '5%', mt: '2%' }}>
+          <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
+            <Box sx={{mt: "1%"}}></Box>
             <h1 className={styles.mainheading}>Dashboard</h1>
+            <Box sx={{mt: "2%"}}></Box>
+            <Autocomplete
+                
+                multiple
+                id="Searchbar"
+                options={patientNames}
+                
+                filterSelectedOptions
+                renderInput={(params) => (
+                <TextField
+                    sx = {{backgroundColor:"white", borderRadius: 25}}
+                    {...params}
+                    label="Search for Patients"
+                    placeholder="Enter Patient Name"
+                    
+                    
+                />
+                
+                )}
+                
+                
+                sx={{ flexGrow:7, }}
+            />
+             <Box sx={{mb: "2%"}}></Box>
             <ul>
               {patientNames.map((patientName) => (
-                <li key={patientName}>
+                <ListItemButton sx={{backgroundColor:'#34497980', borderRadius: 50, mt: "1%"}} key={patientName}>
                   {patientName}
-                  <Button sx={{ backgroundColor: 'white', ml: '2%' }}></Button>
-                </li>
+                  
+                </ListItemButton>
               ))}
             </ul>
           </Box>

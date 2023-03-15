@@ -5,6 +5,7 @@
     'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',
     'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
   --toolbar-spacing: 100px; 
+  --maincolor: rgba(52, 73, 121, 0.5);
 }
 
 * {
