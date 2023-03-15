@@ -1,29 +1,16 @@
-import { app } from '@/firebase/initFirebase';
-import { KeyedQuestionSet, Question, QuestionSet } from '@/types/questions';
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  getFirestore,
-  setDoc
-} from 'firebase/firestore/lite';
+import { Firestore, collection, doc, setDoc } from 'firebase/firestore/lite';
 
-const info = "info";
+export async function create_user_set(
+  db: Firestore,
+  email: string,
+  uid: string
+) {
+  const userCollection = collection(db, 'users');
 
-export async function create_user_set(email: string, uid: string) {
-  try {
-    const db = getFirestore(app);
-    await setDoc(doc(db, uid, "info"), {
-        email: email, 
-      });
-
-  } catch (error) {
-    console.log(error);
-    return 1;
-  }
+  await setDoc(doc(userCollection, uid), {
+    email: email,
+    patients: []
+  });
 }
 
-export default create_user_set
-
+export default create_user_set;
