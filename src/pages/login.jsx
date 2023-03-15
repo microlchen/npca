@@ -7,7 +7,7 @@ import 'firebase/firestore'
 import React, { useState } from 'react'
 import { create_user_set } from '@/data/user';
 
-export default function login() {
+export default function Login() {
     const auth = getAuth(app)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
