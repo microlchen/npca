@@ -12,12 +12,11 @@ import {
 
 const info = "info";
 
-export async function create_user_set(email: string, password: string) {
+export async function create_user_set(email: string, uid: string) {
   try {
     const db = getFirestore(app);
-    await setDoc(doc(db, email, "info"), {
+    await setDoc(doc(db, uid, "info"), {
         email: email, 
-        password: password
       });
 
   } catch (error) {
@@ -27,3 +26,4 @@ export async function create_user_set(email: string, password: string) {
 }
 
 export default create_user_set
+
