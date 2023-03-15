@@ -1,5 +1,3 @@
-initAuth.js
-
 import { init } from 'next-firebase-auth'
 
 const initAuth = () => {
