@@ -7,6 +7,11 @@
   min-height: 100vh;
   background-color: #00081a;
 }
+.individualpatientboxspacing {
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
 .spacing {
   margin-top: var(--toolbar-spacing);
 }

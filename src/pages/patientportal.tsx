@@ -2,7 +2,7 @@ import * as React from 'react';
 import nookies from 'nookies';
 import { Inter } from 'next/font/google';
 import {
-  
+  Button,
   Drawer,
   TextField,
   Autocomplete,
@@ -119,7 +119,7 @@ function Dashboard({
           <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
             <Box sx={{mt: "1%"}}></Box>
             <h1 className={styles.mainheading}>Dashboard</h1>
-            <Box sx={{mt: "2%"}}></Box>
+            <Box sx={{mt: "0.5%", mb: '1%'}}><Button href='./individualpatient' sx ={{backgroundColor:'#34497980', color: 'white'}}>Add New Patient</Button></Box>
             <Autocomplete
                 
                 multiple
