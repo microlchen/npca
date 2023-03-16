@@ -12,7 +12,6 @@ import {
 import { useState } from 'react';
 import GuardedPage from '@/components/GuardedPage';
 import styles from '@/styles/Home.module.css';
-import { useAuth } from 'reactfire';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getAdminSDK } from '@/firebase/initFirebaseAdmin';
 
