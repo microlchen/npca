@@ -117,15 +117,15 @@
 }
 
 .center::before {
-  background: rgba(52, 73, 121, 0.5);
+  background: rgba(52, 73, 121, 0.205);
   border-radius: 50%;
   width: 500px;
   height: 400px;
-  margin-left: -400px;
+  margin-left: -300px;
 }
 
 .center::after {
-  background:rgba(52, 73, 121, 0.5);
+  background:rgba(52, 73, 121, 0.205);
   width: 220px;
   height: 180px;
   z-index: -1;
