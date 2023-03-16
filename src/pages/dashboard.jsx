@@ -36,13 +36,17 @@ export default function Home() {
         <div className={styles.spacing}></div>
 
         <div className={styles.grid}>
-          <Button onClick={onLogin} className={styles.card}>
-            <h2 className={geo.className}>
-              Log In <span>-&gt;</span>
-            </h2>
-            <p className={geo.className}>
-              Sign up and log in today to improve your workflow!
-            </p>
+          <Button onClick={onLogin} >
+            <a
+            className={styles.card}
+            >
+              <h2 className={geo.className}>
+                Log In <span>-&gt;</span>
+              </h2>
+              <p className={geo.className}>
+                Sign up and log in today to improve your workflow!
+              </p>
+            </a>
           </Button>
 
           <a

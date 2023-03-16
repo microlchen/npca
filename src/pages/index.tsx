@@ -79,10 +79,10 @@ export default function Login() {
     >
       <Box sx={{ mt: '7%' }}>
         <Image
-          src="/npca.png"
+          src="/Mindscope (3).png"
           alt="Next.js Logo"
-          width={380}
-          height={167}
+          width={452}
+          height={153}
           priority
         />
       </Box>
