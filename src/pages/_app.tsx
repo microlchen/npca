@@ -1,6 +1,6 @@
 import { clientCredentials } from '@/firebase/initFirebase';
 import '@/styles/globals.css';
-import { initializeApp } from 'firebase/app';
+import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth, initializeAuth } from 'firebase/auth';
 import Head from 'next/head';
 import {
@@ -28,7 +28,12 @@ function CookieSetter({ children }) {
 }
 
 export default function App({ Component, pageProps }) {
-  const app = initializeApp(clientCredentials);
+  let app: FirebaseApp;
+  if (!getApps().length) {
+    app = initializeApp(clientCredentials);
+  } else {
+    app = getApp();
+  }
   const storage = getFirestore(app);
   const auth = initializeAuth(app);
   return (
