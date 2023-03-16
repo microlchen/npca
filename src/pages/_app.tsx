@@ -1,7 +1,11 @@
-import { clientCredentials } from '@/firebase/initFirebase';
+import { clientCredentials } from '@/firebase/credentials';
 import '@/styles/globals.css';
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth, initializeAuth } from 'firebase/auth';
+import {
+  browserSessionPersistence,
+  getAuth,
+  initializeAuth
+} from 'firebase/auth';
 import Head from 'next/head';
 import {
   AuthProvider,
@@ -35,7 +39,10 @@ export default function App({ Component, pageProps }) {
     app = getApp();
   }
   const storage = getFirestore(app);
-  const auth = initializeAuth(app);
+  const auth = initializeAuth(app, {
+    persistence: browserSessionPersistence,
+    popupRedirectResolver: undefined
+  });
   return (
     <FirebaseAppProvider firebaseApp={app}>
       <FirestoreProvider sdk={storage}>
