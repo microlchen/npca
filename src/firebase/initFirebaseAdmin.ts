@@ -1,9 +1,10 @@
 import * as admin from 'firebase-admin';
 
 import { credential } from 'firebase-admin';
+import { Auth } from 'firebase-admin/auth';
 import { initializeApp } from 'firebase-admin/app';
 
-export function getAdminSDK() {
+export function getAdminAuth(): Auth {
   // ONLY USE FROM SERVER SIDE
   if (!admin.apps.length) {
     initializeApp({
@@ -12,5 +13,5 @@ export function getAdminSDK() {
       )
     });
   }
-  return admin;
+  return admin.auth();
 }

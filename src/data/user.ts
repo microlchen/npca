@@ -1,4 +1,12 @@
-import { Firestore, collection, doc, setDoc } from 'firebase/firestore/lite';
+import {
+  Firestore,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc
+} from 'firebase/firestore';
 
 export async function create_user_set(
   db: Firestore,
@@ -13,4 +21,17 @@ export async function create_user_set(
   });
 }
 
-export default create_user_set;
+export async function getPatientIds(
+  db: Firestore,
+  uid: string
+): Promise<string[]> {
+  const userCollection = collection(db, 'users');
+  return (await getDoc(doc(userCollection, uid))).get('patients');
+}
+
+export function addPatientId(db: Firestore, userId: string, patientId: string) {
+  const userCollection = collection(db, 'users');
+  updateDoc(doc(userCollection, userId), {
+    patients: arrayUnion(patientId)
+  });
+}

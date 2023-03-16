@@ -3,16 +3,17 @@ import { getAnalytics } from 'firebase/analytics';
 import { getPerformance } from 'firebase/performance';
 import { clientCredentials } from './credentials';
 
-if (!getApps().length) {
-  // Does it matter that the return values are thrown away?
-  initializeApp(clientCredentials);
-  if (typeof window !== 'undefined') {
-    if ('measurementId' in clientCredentials) {
-      getAnalytics();
-      getPerformance();
+export default function getFirebaseApp() {
+  if (!getApps().length) {
+    // Does it matter that the return values are thrown away?
+    initializeApp(clientCredentials);
+    if (typeof window !== 'undefined') {
+      if ('measurementId' in clientCredentials) {
+        getAnalytics();
+        getPerformance();
+      }
     }
+    console.log('Firebase was successfully init.');
   }
-  console.log('Firebase was successfully init.');
+  return getApp();
 }
-const app = getApp();
-export { app };
