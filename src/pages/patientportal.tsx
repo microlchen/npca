@@ -99,7 +99,6 @@ function Dashboard({
   const onClickPatient = (patientId: string) => {
     router.push(`/patient/${patientId}`);
   };
-  const dataFiltered = filterData(searchQuery, patientsState);
 
   return (
     <>
