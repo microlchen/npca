@@ -103,23 +103,26 @@ function Dashboard({
   return (
     <>
       <Header />
-      <GuardedPage>
-        <div>
-          <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
-            <Box sx={{ mt: '1%' }}></Box>
-            <h1 className={styles.mainheading}>Dashboard</h1>
-            <Box sx={{ mt: '0.5%', mb: '1%' }}>
-              <NewPatientFormDialog callback={addPatient} />
-            </Box>
-            <TextField
-              sx={{ backgroundColor: 'white', borderRadius: 25 }}
-              label="Search for Patients"
-              placeholder="Enter Patient Name"
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Box sx={{ mb: '2%' }}></Box>
-            <ul>
-              {dataFiltered.map((patient: KeyedPatient) => (
+      {/* <GuardedPage> */}
+      <div>
+        <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
+          <Box sx={{ mt: '1%' }}></Box>
+          <h1 className={styles.mainheading}>Dashboard</h1>
+          <Box sx={{ mt: '0.5%', mb: '1%' }}>
+            <NewPatientFormDialog callback={addPatient} />
+          </Box>
+          <TextField
+            variant="filled"
+            sx={{ backgroundColor: 'white', borderRadius: 5 }}
+            label="Search for Patients"
+            placeholder="Enter Patient Name"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{ disableUnderline: true }}
+          />
+          <Box sx={{ mb: '2%' }}></Box>
+          <ul>
+            {dataFiltered.map((patient: KeyedPatient) => (
+              <Box sx={{ boxShadow: 3 }} key={patient.name}>
                 <ListItemButton
                   sx={{
                     backgroundColor: '#34497980',
@@ -127,15 +130,15 @@ function Dashboard({
                     mt: '1%'
                   }}
                   onClick={() => onClickPatient(patient.id)}
-                  key={patient.name}
                 >
                   {patient.name}
                 </ListItemButton>
-              )) ?? 'No patients'}
-            </ul>
-          </Box>
-        </div>
-      </GuardedPage>
+              </Box>
+            )) ?? 'No patients'}
+          </ul>
+        </Box>
+      </div>
+      {/* </GuardedPage> */}
     </>
   );
 }

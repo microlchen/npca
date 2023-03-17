@@ -158,17 +158,18 @@ export default function Individuals({
         <Box sx={{ mt: '1%' }}></Box>
         <List>
           {questionTypes.map((questionType) => (
-            <ListItemButton
-              sx={{
-                backgroundColor: '#34497980',
-                borderRadius: 50,
-                mt: '1%'
-              }}
-              onClick={() => onClickForm(questionType)}
-              key={questionType.id}
-            >
-              {`Send ${questionType.name} form`}
-            </ListItemButton>
+            <Box sx={{ boxShadow: 3 }} key={questionType.id}>
+              <ListItemButton
+                sx={{
+                  backgroundColor: '#34497980',
+                  borderRadius: 50,
+                  mt: '1%'
+                }}
+                onClick={() => onClickForm(questionType)}
+              >
+                {`Send ${questionType.name} form`}
+              </ListItemButton>
+            </Box>
           ))}
         </List>
         <Box sx={{ mb: '2%' }}></Box>
