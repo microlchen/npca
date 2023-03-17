@@ -1,6 +1,12 @@
 import * as React from 'react';
 import nookies from 'nookies';
-import { TextField, Autocomplete, Box, ListItemButton } from '@mui/material/';
+import {
+  TextField,
+  Autocomplete,
+  Box,
+  ListItemButton,
+  useAutocomplete
+} from '@mui/material/';
 import { useState } from 'react';
 import GuardedPage from '@/components/GuardedPage';
 import styles from '@/styles/Home.module.css';
@@ -15,6 +21,7 @@ import getFirebaseApp from '@/firebase/initFirebase';
 import NewPatientFormDialog from '@/components/subpages/NewPatient';
 import { Patient } from '@/types/users';
 import { useFirestore, useFirestoreDocData } from 'reactfire';
+import { Router, useRouter } from 'next/router';
 
 async function getServerLoggedIn(
   cookies: {
@@ -68,21 +75,15 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   const user = await getServerLoggedIn(cookies, adminAuth);
 
+  let patients: Patient[] = [];
   if (user.isLoggedIn) {
     const db = getFirebaseApp();
-    const patients = await getAllPatients(getFirestore(db), user.userId);
-    return {
-      props: {
-        patients: patients,
-        userId: user.userId,
-        isLoggedIn: user.isLoggedIn
-      }
-    };
+    patients = await getAllPatients(getFirestore(db), user.userId);
   }
 
   return {
     props: {
-      patients: [],
+      patients: patients,
       userId: user.userId,
       isLoggedIn: user.isLoggedIn
     }
@@ -94,6 +95,11 @@ function Dashboard({
   userId,
   isLoggedIn
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
+  if (!isLoggedIn) {
+    router.push('');
+  }
+
   const db = useFirestore();
 
   const addPatient = React.useCallback<(patient: Patient) => Promise<void>>(
@@ -101,10 +107,21 @@ function Dashboard({
       const uid = await createPatient(db, patient);
       addPatientId(db, userId, uid);
     },
-    []
+    [db, userId]
   );
 
-  const [patientNames, setPatientNames] = useState(patients);
+  const [patientsState, setPatients] = useState(patients);
+  const [searchQuery, setSearchQuery] = useState('');
+  const filterData = (query: string, data: Patient[]) => {
+    if (!query) {
+      return data;
+    } else {
+      return data.filter((el) =>
+        el.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+  };
+  const dataFiltered = filterData(searchQuery, patientsState);
 
   const { status, data } = useFirestoreDocData(
     doc(collection(db, 'users'), userId)
@@ -113,12 +130,10 @@ function Dashboard({
   React.useEffect(() => {
     if (status !== 'loading') {
       getPatientsData(db, data.patients).then((patients) => {
-        console.log(patients);
-        setPatientNames(patients);
+        setPatients(patients);
       });
     }
-  }, [status, data]);
-  console.log(patientNames);
+  }, [status, data, db]);
 
   return (
     <>
@@ -131,24 +146,15 @@ function Dashboard({
             <Box sx={{ mt: '0.5%', mb: '1%' }}>
               <NewPatientFormDialog callback={addPatient} />
             </Box>
-            <Autocomplete
-              multiple
-              id="Searchbar"
-              options={patientNames}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  sx={{ backgroundColor: 'white', borderRadius: 25 }}
-                  {...params}
-                  label="Search for Patients"
-                  placeholder="Enter Patient Name"
-                />
-              )}
-              sx={{ flexGrow: 7 }}
+            <TextField
+              sx={{ backgroundColor: 'white', borderRadius: 25 }}
+              label="Search for Patients"
+              placeholder="Enter Patient Name"
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Box sx={{ mb: '2%' }}></Box>
             <ul>
-              {patientNames.map((patient: Patient) => (
+              {dataFiltered.map((patient: Patient) => (
                 <ListItemButton
                   sx={{
                     backgroundColor: '#34497980',

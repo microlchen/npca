@@ -45,13 +45,10 @@ export async function getPatientsData(db: Firestore, uids: string[]) {
   snapshots.forEach((document) =>
     patients.push(
       ...document.docs.map((snapshot) => {
-        console.log(snapshot.data());
         return { name: snapshot.data().name };
       })
     )
   );
-
-  console.log(patients);
 
   return patients;
 }
