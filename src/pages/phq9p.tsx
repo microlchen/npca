@@ -9,15 +9,18 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { get_generic_question_types, get_question_set } from '@/data/questions';
 import { KeyedQuestionSet } from '@/types/questions';
+import getFirebaseApp from '@/firebase/initFirebase';
+import { Firestore, getFirestore } from 'firebase/firestore';
 
-async function getPHQ9(): Promise<KeyedQuestionSet> {
-  const types = await get_generic_question_types();
+async function getPHQ9(db: Firestore): Promise<KeyedQuestionSet> {
+  const types = await get_generic_question_types(db);
   const { id } = types.find((value) => value.name == 'PHQ-9');
-  return get_question_set(id);
+  return get_question_set(db, id);
 }
 
 export async function getServerSideProps() {
-  const phq9 = await getPHQ9();
+  const app = getFirebaseApp();
+  const phq9 = await getPHQ9(getFirestore(app));
   return {
     props: { questions: phq9 } // will be passed to the page component as props
   };

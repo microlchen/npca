@@ -12,59 +12,20 @@ import GuardedPage from '@/components/GuardedPage';
 import styles from '@/styles/Home.module.css';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
-import { Auth } from 'firebase-admin/auth';
 import Header from '@/components/subpages/header';
-import { addPatientId, getPatientIds } from '@/data/user';
+import { addPatientId, getPatientIds, getServerLoggedIn } from '@/data/user';
 import { Firestore, collection, doc, getFirestore } from 'firebase/firestore';
 import { createPatient, getPatientsData } from '@/data/patients';
 import getFirebaseApp from '@/firebase/initFirebase';
 import NewPatientFormDialog from '@/components/subpages/NewPatient';
-import { Patient } from '@/types/users';
+import { KeyedPatient, Patient } from '@/types/users';
 import { useFirestore, useFirestoreDocData } from 'reactfire';
-import { Router, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
-async function getServerLoggedIn(
-  cookies: {
-    [key: string]: string;
-  },
-  adminAuth: Auth
-): Promise<{
-  isLoggedIn: boolean;
-  userId: string;
-}> {
-  if (!cookies.token) {
-    return {
-      isLoggedIn: false,
-      userId: null
-    };
-  }
-
-  try {
-    const token = await adminAuth.verifyIdToken(cookies.token);
-    if (!token) {
-      return {
-        isLoggedIn: false,
-        userId: null
-      };
-    }
-
-    // the user is authenticated!
-    const { uid } = token;
-    const user = await adminAuth.getUser(uid);
-
-    return {
-      isLoggedIn: true,
-      userId: user.uid
-    };
-  } catch (error) {
-    return {
-      isLoggedIn: false,
-      userId: null
-    };
-  }
-}
-
-async function getAllPatients(db: Firestore, userId: string) {
+async function getAllPatients(
+  db: Firestore,
+  userId: string
+): Promise<KeyedPatient[]> {
   const patients = await getPatientsData(db, await getPatientIds(db, userId));
   return patients;
 }
@@ -75,7 +36,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   const user = await getServerLoggedIn(cookies, adminAuth);
 
-  let patients: Patient[] = [];
+  let patients: KeyedPatient[] = [];
   if (user.isLoggedIn) {
     const db = getFirebaseApp();
     patients = await getAllPatients(getFirestore(db), user.userId);
@@ -112,7 +73,7 @@ function Dashboard({
 
   const [patientsState, setPatients] = useState(patients);
   const [searchQuery, setSearchQuery] = useState('');
-  const filterData = (query: string, data: Patient[]) => {
+  const filterData = (query: string, data: KeyedPatient[]) => {
     if (!query) {
       return data;
     } else {
@@ -135,6 +96,10 @@ function Dashboard({
     }
   }, [status, data, db]);
 
+  const onClickPatient = (patientId: string) => {
+    router.push(`/patient/${patientId}`);
+  };
+
   return (
     <>
       <Header />
@@ -154,13 +119,14 @@ function Dashboard({
             />
             <Box sx={{ mb: '2%' }}></Box>
             <ul>
-              {dataFiltered.map((patient: Patient) => (
+              {dataFiltered.map((patient: KeyedPatient) => (
                 <ListItemButton
                   sx={{
                     backgroundColor: '#34497980',
                     borderRadius: 50,
                     mt: '1%'
                   }}
+                  onClick={() => onClickPatient(patient.id)}
                   key={patient.name}
                 >
                   {patient.name}

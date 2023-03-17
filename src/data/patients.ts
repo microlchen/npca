@@ -1,4 +1,4 @@
-import { Patient } from '@/types/users';
+import { KeyedPatient, Patient } from '@/types/users';
 import {
   DocumentData,
   Firestore,
@@ -20,7 +20,10 @@ export async function createPatient(
   return (await newPatient).id;
 }
 
-export async function getPatientsData(db: Firestore, uids: string[]) {
+export async function getPatientsData(
+  db: Firestore,
+  uids: string[]
+): Promise<KeyedPatient[]> {
   const patientCollection = collection(db, 'patients');
 
   const patientQueries: Promise<QuerySnapshot<DocumentData>>[] = [];
@@ -38,14 +41,14 @@ export async function getPatientsData(db: Firestore, uids: string[]) {
     patientQueries.push(getDocs(uidsQuery));
   }
 
-  const patients: Patient[] = [];
+  const patients: KeyedPatient[] = [];
 
   const snapshots = await Promise.all(patientQueries);
 
   snapshots.forEach((document) =>
     patients.push(
       ...document.docs.map((snapshot) => {
-        return { name: snapshot.data().name };
+        return { id: snapshot.id, name: snapshot.data().name };
       })
     )
   );
