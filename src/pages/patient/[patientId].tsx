@@ -3,6 +3,7 @@ import nookies from 'nookies';
 import styles from '@/styles/Home.module.css';
 import { Inter } from 'next/font/google';
 import { useState } from 'react';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 import {
   ListItemButton,
@@ -13,7 +14,12 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Typography
+  Typography,
+  FormControl,
+  InputLabel,
+  Input,
+  InputAdornment,
+  IconButton
 } from '@mui/material/';
 import GuardedPage from '@/components/GuardedPage';
 import Header from '@/components/subpages/header';
@@ -96,19 +102,46 @@ export default function Individuals({
   return (
     <>
       <Header />
-      {/* <GuardedPage> */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Patient</DialogTitle>
         <DialogContent>
           <Typography>Send this form to your patient:</Typography>
-          <Typography>{formId}</Typography>
+          {/* <Typography>{formId}</Typography> */}
+          <FormControl fullWidth variant="standard">
+            <InputLabel htmlFor="input-with-icon-adornment">
+              Copy to clipboard
+            </InputLabel>
+            <Input
+              id="input-with-icon-adornment"
+              value={formId}
+              readOnly
+              fullWidth
+              role="textbox"
+              sx={{
+                width: '500px'
+              }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <IconButton
+                    onClick={() => {
+                      navigator.clipboard.writeText(formId);
+                    }}
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>
       <div className={styles.individualpatientboxspacing}>
-        <div className={styles.mainheading}>Patient: {patient.name}</div>
+        <Typography variant="h3" component="h2">
+          Patient: {patient.name}
+        </Typography>
         {/* <Box sx={{ mt: '1%' }}>
             <Image
               src="/npca.png"
@@ -140,7 +173,6 @@ export default function Individuals({
         </List>
         <Box sx={{ mb: '2%' }}></Box>
       </div>
-      {/* </GuardedPage> */}
     </>
   );
 }
