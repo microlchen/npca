@@ -1,174 +1,176 @@
 import * as React from 'react';
 import nookies from 'nookies';
-import { Inter } from 'next/font/google';
 import {
-  Button,
-  Drawer,
   TextField,
   Autocomplete,
   Box,
-  ListItemButton
+  ListItemButton,
+  useAutocomplete
 } from '@mui/material/';
 import { useState } from 'react';
 import GuardedPage from '@/components/GuardedPage';
 import styles from '@/styles/Home.module.css';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { getAdminSDK } from '@/firebase/initFirebaseAdmin';
+import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
+import { Auth } from 'firebase-admin/auth';
+import Header from '@/components/subpages/header';
+import { addPatientId, getPatientIds } from '@/data/user';
+import { Firestore, collection, doc, getFirestore } from 'firebase/firestore';
+import { createPatient, getPatientsData } from '@/data/patients';
+import getFirebaseApp from '@/firebase/initFirebase';
+import NewPatientFormDialog from '@/components/subpages/NewPatient';
+import { Patient } from '@/types/users';
+import { useFirestore, useFirestoreDocData } from 'reactfire';
+import { Router, useRouter } from 'next/router';
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const cookies = nookies.get(ctx);
-  const adminSDK = getAdminSDK();
+async function getServerLoggedIn(
+  cookies: {
+    [key: string]: string;
+  },
+  adminAuth: Auth
+): Promise<{
+  isLoggedIn: boolean;
+  userId: string;
+}> {
   if (!cookies.token) {
     return {
-      props: {
-        isLoggedIn: false
-      }
+      isLoggedIn: false,
+      userId: null
     };
   }
 
   try {
-    const token = await adminSDK.auth().verifyIdToken(cookies.token);
+    const token = await adminAuth.verifyIdToken(cookies.token);
     if (!token) {
       return {
-        props: {
-          isLoggedIn: false
-        }
+        isLoggedIn: false,
+        userId: null
       };
     }
 
     // the user is authenticated!
     const { uid } = token;
-    const user = await adminSDK.auth().getUser(uid);
+    const user = await adminAuth.getUser(uid);
 
     return {
-      props: {
-        isLoggedIn: true
-      }
+      isLoggedIn: true,
+      userId: user.uid
     };
   } catch (error) {
     return {
-      props: {
-        isLoggedIn: false
-      }
+      isLoggedIn: false,
+      userId: null
     };
   }
+}
+
+async function getAllPatients(db: Firestore, userId: string) {
+  const patients = await getPatientsData(db, await getPatientIds(db, userId));
+  return patients;
+}
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const cookies = nookies.get(ctx);
+  const adminAuth = getAdminAuth();
+
+  const user = await getServerLoggedIn(cookies, adminAuth);
+
+  let patients: Patient[] = [];
+  if (user.isLoggedIn) {
+    const db = getFirebaseApp();
+    patients = await getAllPatients(getFirestore(db), user.userId);
+  }
+
+  return {
+    props: {
+      patients: patients,
+      userId: user.userId,
+      isLoggedIn: user.isLoggedIn
+    }
+  };
 };
 
-const inter = Inter({ subsets: ['latin'] });
-
 function Dashboard({
+  patients,
+  userId,
   isLoggedIn
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  console.log(isLoggedIn);
-  const [anchorDrawer, setAnchorDrawer] = useState(null);
+  const router = useRouter();
+  if (!isLoggedIn) {
+    router.push('');
+  }
 
-  const openDrawer = (event) => {
-    setAnchorDrawer(event.currentTarget);
+  const db = useFirestore();
+
+  const addPatient = React.useCallback<(patient: Patient) => Promise<void>>(
+    async (patient) => {
+      const uid = await createPatient(db, patient);
+      addPatientId(db, userId, uid);
+    },
+    [db, userId]
+  );
+
+  const [patientsState, setPatients] = useState(patients);
+  const [searchQuery, setSearchQuery] = useState('');
+  const filterData = (query: string, data: Patient[]) => {
+    if (!query) {
+      return data;
+    } else {
+      return data.filter((el) =>
+        el.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
   };
-  const closeDrawer = () => {
-    setAnchorDrawer(null);
-  };
+  const dataFiltered = filterData(searchQuery, patientsState);
 
-  const [patientNames, setPatientNames] = useState([
-    'Test One',
-    'Test 2',
-    'Make',
-    'Each',
-    'button',
-    'a unique link',
-    'individualpatient.jsx will take on textfields from database'
-  ]);
+  const { status, data } = useFirestoreDocData(
+    doc(collection(db, 'users'), userId)
+  );
 
-  /*useEffect(() => {
-        // Get the hashmap of patients from an API
-        fetch('/api/patients/hashmap')
-            .then(response => response.json())
-            .then(patients => {
-                // Extract the names of all patients from the hashmap
-                const patientNames = Object.values(patients).map(patient => patient.name);
-
-                // Update the state with the list of patient names
-                setPatientNames(patientNames);
-            })
-            .catch(error => console.error(error));
-    }, []);*/
+  React.useEffect(() => {
+    if (status !== 'loading') {
+      getPatientsData(db, data.patients).then((patients) => {
+        setPatients(patients);
+      });
+    }
+  }, [status, data, db]);
 
   return (
-    <GuardedPage>
-      <div className={styles.grid2}>
-        <a
-          onClick={openDrawer}
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Patient Profiles <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Track your patient&apos;s growth and wellness through our automated
-            system over time!
-          </p>
-        </a>
-        <Drawer
-          anchor="left"
-          open={Boolean(anchorDrawer)}
-          onClose={closeDrawer}
-          PaperProps={{
-            sx: {
-              marginTop: '100px',
-              backgroundColor: '#34497980',
-              color: 'white',
-              flexGrow: 1,
-              width: '100%'
-            }
-          }}
-        >
+    <>
+      <Header />
+      <GuardedPage>
+        <div>
           <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
             <Box sx={{ mt: '1%' }}></Box>
             <h1 className={styles.mainheading}>Dashboard</h1>
             <Box sx={{ mt: '0.5%', mb: '1%' }}>
-              <Button
-                href="./individualpatient"
-                sx={{ backgroundColor: '#34497980', color: 'white' }}
-              >
-                Add New Patient
-              </Button>
+              <NewPatientFormDialog callback={addPatient} />
             </Box>
-            <Autocomplete
-              multiple
-              id="Searchbar"
-              options={patientNames}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  sx={{ backgroundColor: 'white', borderRadius: 25 }}
-                  {...params}
-                  label="Search for Patients"
-                  placeholder="Enter Patient Name"
-                />
-              )}
-              sx={{ flexGrow: 7 }}
+            <TextField
+              sx={{ backgroundColor: 'white', borderRadius: 25 }}
+              label="Search for Patients"
+              placeholder="Enter Patient Name"
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Box sx={{ mb: '2%' }}></Box>
             <ul>
-              {patientNames.map((patientName) => (
+              {dataFiltered.map((patient: Patient) => (
                 <ListItemButton
                   sx={{
                     backgroundColor: '#34497980',
                     borderRadius: 50,
                     mt: '1%'
                   }}
-                  key={patientName}
+                  key={patient.name}
                 >
-                  {patientName}
+                  {patient.name}
                 </ListItemButton>
-              ))}
+              )) ?? 'No patients'}
             </ul>
           </Box>
-        </Drawer>
-      </div>
-    </GuardedPage>
+        </div>
+      </GuardedPage>
+    </>
   );
 }
 

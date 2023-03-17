@@ -1,3 +1,6 @@
+'use client';
+
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useAuth, useSigninCheck } from 'reactfire';
 
@@ -7,12 +10,15 @@ export default function GuardedPage({
 }: React.PropsWithChildren<{
   whenSignedOut?: string;
 }>) {
+  const router = useRouter();
   const auth = useAuth();
-  const { status } = useSigninCheck();
+  const check = useSigninCheck();
 
   useEffect(() => {
     // this should run once and only on success
-    if (status !== 'success') {
+    console.log(check);
+    if (check.status !== 'success') {
+      console.log('failed to get sign in status');
       return;
     }
 
@@ -34,7 +40,17 @@ export default function GuardedPage({
 
     // destroy listener on un-mounts
     return () => listener();
-  }, [auth, status, whenSignedOut]);
+  }, [auth, check, whenSignedOut]);
 
-  return <>{children}</>;
+  const { status, data: signInCheckResult } = useSigninCheck();
+
+  if (status === 'loading') {
+    return <span>loading...</span>;
+  }
+
+  if (signInCheckResult.signedIn === true) {
+    return <>{children}</>;
+  } else {
+    router.push('/');
+  }
 }

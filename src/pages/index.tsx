@@ -156,9 +156,6 @@ export default function Login() {
             sx={{ mt: 3, mb: 2 }}
             disabled={signInLoading || signUpLoading}
             type="submit"
-            name="action"
-            value="up"
-            href="./dashboard"
             onClick={() => onSubmit(Submitter.SignUp)}
           >
             Sign Up

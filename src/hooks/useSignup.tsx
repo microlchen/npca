@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
 import { useRequestState } from './useRequestState';
 import { useCallback } from 'react';
-import create_user_set from '@/data/user';
+import { create_user_set } from '@/data/user';
 
 export function useSignUpWithEmailAndPassword() {
   const auth = useAuth();
@@ -28,8 +28,7 @@ export function useSignUpWithEmailAndPassword() {
         );
 
         setData(cred);
-
-        create_user_set(db, email, cred.user.uid);
+        await create_user_set(db, email, cred.user.uid);
       } catch (error) {
         setError(error as FirebaseError);
       }
