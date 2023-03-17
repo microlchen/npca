@@ -122,7 +122,7 @@ function Dashboard({
           <Box sx={{ mb: '2%' }}></Box>
           <ul>
             {dataFiltered.map((patient: KeyedPatient) => (
-              <Box sx={{ boxShadow: 3 }} key={patient.name}>
+              <Box key={patient.name}>
                 <ListItemButton
                   sx={{
                     backgroundColor: '#34497980',

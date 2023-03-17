@@ -158,7 +158,7 @@ export default function Individuals({
         <Box sx={{ mt: '1%' }}></Box>
         <List>
           {questionTypes.map((questionType) => (
-            <Box sx={{ boxShadow: 3 }} key={questionType.id}>
+            <Box key={questionType.id}>
               <ListItemButton
                 sx={{
                   backgroundColor: '#34497980',
