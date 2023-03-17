@@ -1,3 +1,4 @@
+import { Auth } from 'firebase-admin/auth';
 import {
   Firestore,
   arrayUnion,
@@ -34,4 +35,45 @@ export function addPatientId(db: Firestore, userId: string, patientId: string) {
   updateDoc(doc(userCollection, userId), {
     patients: arrayUnion(patientId)
   });
+}
+
+export async function getServerLoggedIn(
+  cookies: {
+    [key: string]: string;
+  },
+  adminAuth: Auth
+): Promise<{
+  isLoggedIn: boolean;
+  userId: string;
+}> {
+  if (!cookies.token) {
+    return {
+      isLoggedIn: false,
+      userId: null
+    };
+  }
+
+  try {
+    const token = await adminAuth.verifyIdToken(cookies.token);
+    if (!token) {
+      return {
+        isLoggedIn: false,
+        userId: null
+      };
+    }
+
+    // the user is authenticated!
+    const { uid } = token;
+    const user = await adminAuth.getUser(uid);
+
+    return {
+      isLoggedIn: true,
+      userId: user.uid
+    };
+  } catch (error) {
+    return {
+      isLoggedIn: false,
+      userId: null
+    };
+  }
 }

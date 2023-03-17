@@ -16,7 +16,6 @@ export default function GuardedPage({
 
   useEffect(() => {
     // this should run once and only on success
-    console.log(check);
     if (check.status !== 'success') {
       console.log('failed to get sign in status');
       return;
