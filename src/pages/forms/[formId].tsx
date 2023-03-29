@@ -7,11 +7,17 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { get_question_set, getUserForm } from '@/data/questions';
+import {
+  createCompletedForm,
+  get_question_set,
+  getUserForm,
+  removeOutstandingForm
+} from '@/data/questions';
 import { Form } from '@/types/questions';
 import getFirebaseApp from '@/firebase/initFirebase';
-import { collection, getFirestore, doc } from 'firebase/firestore';
-import { GetServerSidePropsContext } from 'next';
+import { collection, getFirestore, doc, Firestore } from 'firebase/firestore';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { useFirestore } from 'reactfire';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const app = getFirebaseApp();
@@ -31,11 +37,32 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-function PatientForm({ questionSet, formId, patientId, providerId }) {
+async function uploadResults(
+  db: Firestore,
+  patientId: string,
+  providerId: string,
+  formId: string,
+  answerMap: { id: string; answer: string }[]
+) {
+  createCompletedForm(db, patientId, providerId, formId, answerMap);
+  removeOutstandingForm(db, patientId, providerId, formId);
+}
+
+function PatientForm({
+  questionSet,
+  formId,
+  patientId,
+  providerId
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const db = useFirestore();
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log(data);
+    const answerMap: { id: string; answer: string }[] = [];
+    for (const [key, value] of data.entries()) {
+      answerMap.push({ id: key, answer: value as string });
+    }
+    uploadResults(db, patientId, providerId, formId, answerMap);
   };
 
   return (
@@ -58,13 +85,16 @@ function PatientForm({ questionSet, formId, patientId, providerId }) {
           {questionSet.questions.map((question) => (
             <div key={question.key}>
               <div className={styles.questions}>{question.question}</div>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Answer</InputLabel>
+              <FormControl required fullWidth>
+                <InputLabel id="demo-simple-select-label" required>
+                  Answer
+                </InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   name={question.key}
                   label="Answer"
+                  defaultValue={''}
                 >
                   {question.responses.map((response, index) => (
                     <MenuItem key={response} value={index}>

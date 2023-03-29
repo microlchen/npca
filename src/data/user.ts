@@ -16,9 +16,11 @@ export async function create_user_set(
 ) {
   const userCollection = collection(db, 'users');
 
-  await setDoc(doc(userCollection, uid), {
+  setDoc(doc(userCollection, uid), {
     email: email,
-    patients: []
+    patients: [],
+    outstanding_forms: [],
+    completed_forms: []
   });
 }
 
