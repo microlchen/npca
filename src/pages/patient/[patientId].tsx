@@ -33,7 +33,12 @@ import {
 } from '@/data/questions';
 import { QuestionType } from '@/types/questions';
 import { useRouter } from 'next/router';
-import { useFirestore, useFirestoreDocDataOnce } from 'reactfire';
+import {
+  useFirestore,
+  useFirestoreCollectionData,
+  useFirestoreDocData,
+  useFirestoreDocDataOnce
+} from 'reactfire';
 
 function Redirect() {
   return (
@@ -42,6 +47,33 @@ function Redirect() {
       <div className="loading-dot">.</div>
     </div>
   );
+}
+
+function PatientForms({
+  patientId,
+  userId
+}: {
+  patientId: string;
+  userId: string;
+}) {
+  const db = useFirestore();
+  const [outstandingForms, setOutstandingForms] = useState([] as string[]);
+  const [completedForms, setCompletedForms] = useState([] as string[]);
+  const { status, data } = useFirestoreDocData(
+    doc(db, `users/${userId}/patient_info/${patientId}`)
+  );
+
+  React.useEffect(() => {
+    if (status !== 'loading') {
+      setCompletedForms(data.completed_forms);
+      setOutstandingForms(data.outstanding_forms);
+    }
+  }, [status]);
+
+  console.log(outstandingForms);
+  console.log(completedForms);
+
+  return <div></div>;
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
@@ -182,6 +214,7 @@ export default function Individuals({
             </Box>
           ))}
         </List>
+        <PatientForms patientId={patientId} userId={userId} />
         <Box sx={{ mb: '2%' }}></Box>
       </div>
     </>

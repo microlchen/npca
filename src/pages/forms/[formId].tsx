@@ -68,10 +68,11 @@ function PatientForm({
   }, []);
 
   React.useEffect(() => {
-    console.log(currentForm);
-    get_question_set(db, currentForm.questionId).then((value) =>
-      updateQuestionSet(value)
-    );
+    if (currentForm.questionId) {
+      get_question_set(db, currentForm.questionId).then((value) =>
+        updateQuestionSet(value)
+      );
+    }
   }, [currentForm]);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
