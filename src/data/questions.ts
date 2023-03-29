@@ -64,6 +64,7 @@ export async function get_question_set(
 ): Promise<KeyedQuestionSet> {
   const question_collection = collection(db, generic_questions_id);
 
+  console.log(id);
   const querySnapshot = await getDoc(doc(question_collection, id));
   const value: KeyedQuestionSet = {
     key: querySnapshot.id,
@@ -191,5 +192,5 @@ export async function generateQuestionLink(
 
 export async function getUserForm(db: Firestore, formId: string) {
   const formCollection = collection(db, 'forms');
-  return await getDocFromServer(doc(formCollection, formId));
+  return await getDoc(doc(formCollection, formId));
 }

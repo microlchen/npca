@@ -1,7 +1,6 @@
 import * as React from 'react';
 import nookies from 'nookies';
 import styles from '@/styles/Home.module.css';
-import { Inter } from 'next/font/google';
 import { useState } from 'react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
@@ -21,7 +20,6 @@ import {
   InputAdornment,
   IconButton
 } from '@mui/material/';
-import GuardedPage from '@/components/GuardedPage';
 import Header from '@/components/subpages/header';
 import { getServerLoggedIn } from '@/data/user';
 import getFirebaseApp from '@/firebase/initFirebase';
@@ -33,11 +31,18 @@ import {
   generateQuestionLink,
   get_generic_question_types
 } from '@/data/questions';
-import { Question, QuestionType } from '@/types/questions';
+import { QuestionType } from '@/types/questions';
 import { useRouter } from 'next/router';
 import { useFirestore, useFirestoreDocDataOnce } from 'reactfire';
 
-const inter = Inter({ subsets: ['latin'] });
+function Redirect() {
+  return (
+    <div className="splash-screen">
+      Redirecting.
+      <div className="loading-dot">.</div>
+    </div>
+  );
+}
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const cookies = nookies.get(ctx);
@@ -45,15 +50,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   const user = await getServerLoggedIn(cookies, adminAuth);
 
-  let questionTypes: QuestionType[] = [];
-  if (user.isLoggedIn) {
-    const db = getFirebaseApp();
-    questionTypes = await get_generic_question_types(getFirestore(db));
-  }
-
   return {
     props: {
-      questionTypes: questionTypes,
       userId: user.userId,
       isLoggedIn: user.isLoggedIn
     }
@@ -61,7 +59,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 };
 
 export default function Individuals({
-  questionTypes,
   userId,
   isLoggedIn
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -70,6 +67,12 @@ export default function Individuals({
   const patientId = router.query['patientId'] as string;
   // Should check if patient is actually a patient of the user
   // Don't have time right now
+
+  const [questionTypes, updateQuestionTypes] = useState([] as QuestionType[]);
+
+  React.useEffect(() => {
+    get_generic_question_types(db).then(updateQuestionTypes);
+  }, [isLoggedIn]);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -99,7 +102,14 @@ export default function Individuals({
     }
   }, [status]);
 
-  return (
+  // Redirect to login if not logged in
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      router.push('/');
+    }
+  });
+
+  return isLoggedIn ? (
     <>
       <Header />
       <Dialog open={open} onClose={handleClose}>
@@ -175,5 +185,7 @@ export default function Individuals({
         <Box sx={{ mb: '2%' }}></Box>
       </div>
     </>
+  ) : (
+    <Redirect />
   );
 }

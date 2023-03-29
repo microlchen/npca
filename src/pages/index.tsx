@@ -7,21 +7,52 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-  Link
+  Link,
+  FormControl
 } from '@mui/material/';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useRef } from 'react';
+import nookies from 'nookies';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSignUpWithEmailAndPassword } from '@/hooks/useSignup';
 import { useRouter } from 'next/router';
 import { useSignInWithEmailAndPassword } from '@/hooks/useSignin';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { getServerLoggedIn } from '@/data/user';
+import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
+import { red } from '@mui/material/colors';
 
 enum Submitter {
   SignIn,
   SignUp
 }
 
-export default function Login() {
+function Loading() {
+  return (
+    <div className="splash-screen">
+      Signing in.
+      <div className="loading-dot">.</div>
+    </div>
+  );
+}
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const cookies = nookies.get(ctx);
+  const adminAuth = getAdminAuth();
+
+  const user = await getServerLoggedIn(cookies, adminAuth);
+
+  return {
+    props: {
+      isLoggedIn: user.isLoggedIn
+    }
+  };
+};
+
+export default function Login({
+  isLoggedIn
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
+
   const onLogin = useCallback(() => {
     console.log('successfully signed in');
     router.push('patientportal');
@@ -36,6 +67,12 @@ export default function Login() {
   const [signIn, signInState] = useSignInWithEmailAndPassword();
   const signInLoading = signInState.loading;
   const signInError = signInState.error;
+  const [termsOfServiceCheckbox, updateTermsofServiceCheckbox] =
+    useState(false);
+
+  const [emailValidation, updateEmailValidation] = useState(false);
+  const [passwordValidation, updatePasswordValidation] = useState(false);
+  const [TOSValidation, updateTOSValidation] = useState(false);
 
   useEffect(() => {
     if (signUpState.success || signInState.success) {
@@ -52,17 +89,40 @@ export default function Login() {
       const data = new FormData(form.current);
       const email = data.get('email') as string;
       const password = data.get('password') as string;
+      let error = false;
 
-      if (submitter == Submitter.SignUp) {
-        return signUp(email, password);
-      } else {
-        return signIn(email, password);
+      if (!email) {
+        updateEmailValidation(true);
+        error = true;
+      }
+      if (!password) {
+        updatePasswordValidation(true);
+        error = true;
+      }
+      updateTOSValidation(termsOfServiceCheckbox);
+      if (!termsOfServiceCheckbox) {
+        error = true;
+      }
+
+      if (!error) {
+        if (submitter == Submitter.SignUp) {
+          return signUp(email, password);
+        } else {
+          return signIn(email, password);
+        }
       }
     },
     [signUpLoading, signUp, signIn]
   );
 
-  return (
+  // Login if login cached
+  useEffect(() => {
+    if (isLoggedIn) {
+      onLogin();
+    }
+  });
+
+  return !isLoggedIn ? (
     <Box
       sx={{
         width: '35%',
@@ -105,6 +165,14 @@ export default function Login() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                error={
+                  emailValidation ||
+                  signUpError != undefined ||
+                  signInError != undefined
+                }
+                onChange={(_) => {
+                  updateEmailValidation(false);
+                }}
                 required
                 fullWidth
                 id="email"
@@ -115,6 +183,14 @@ export default function Login() {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={
+                  passwordValidation ||
+                  signUpError != undefined ||
+                  signInError != undefined
+                }
+                onChange={(_) => {
+                  updatePasswordValidation(false);
+                }}
                 required
                 fullWidth
                 name="password"
@@ -125,19 +201,36 @@ export default function Login() {
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox required value="allowExtraEmails" color="primary" />
-                }
-                label={
-                  <Typography fontSize="medium" color="black">
-                    I accept the &nbsp;
-                    <Link href="./login">{'Terms of Service'}</Link> &nbsp;and
-                    the&nbsp; <Link href="./login">{'Privacy Policy'}</Link>{' '}
-                    &nbsp;of this page.
-                  </Typography>
-                }
-              />
+              <FormControl required>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      required
+                      sx={{
+                        color: TOSValidation ? red[800] : undefined,
+                        '&.Mui-checked': {
+                          color: TOSValidation ? red[600] : undefined
+                        }
+                      }}
+                      onChange={(value) => {
+                        updateTermsofServiceCheckbox(value.target.checked);
+                        updateTOSValidation(false);
+                      }}
+                      name="termsOfServiceCheckbox"
+                      id="termsOfServiceCheckbox"
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Typography fontSize="medium" color="black">
+                      I accept the &nbsp;
+                      <Link href="./login">{'Terms of Service'}</Link> &nbsp;and
+                      the&nbsp; <Link href="./login">{'Privacy Policy'}</Link>{' '}
+                      &nbsp;of this page.
+                    </Typography>
+                  }
+                />
+              </FormControl>
             </Grid>
           </Grid>
           <Button
@@ -175,5 +268,7 @@ export default function Login() {
         </Box>
       </Box>
     </Box>
+  ) : (
+    <Loading />
   );
 }

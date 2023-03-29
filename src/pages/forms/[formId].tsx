@@ -13,26 +13,20 @@ import {
   getUserForm,
   removeOutstandingForm
 } from '@/data/questions';
-import { Form } from '@/types/questions';
-import getFirebaseApp from '@/firebase/initFirebase';
-import { collection, getFirestore, doc, Firestore } from 'firebase/firestore';
+import { Form, KeyedQuestionSet } from '@/types/questions';
+import { Firestore } from 'firebase/firestore';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useFirestore } from 'reactfire';
+import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
+import nookies from 'nookies';
+import { getServerLoggedIn } from '@/data/user';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const app = getFirebaseApp();
-  const db = getFirestore(app);
   const formId = ctx.params['formId'] as string;
-  const form = (await getUserForm(db, formId)).data() as unknown as Form;
-
-  const questionSet = await get_question_set(db, form.questionId);
 
   return {
     props: {
-      questionSet: questionSet,
-      formId: formId,
-      patientId: form.patientId,
-      providerId: form.providerId
+      formId: formId
     }
   };
 };
@@ -49,12 +43,37 @@ async function uploadResults(
 }
 
 function PatientForm({
-  questionSet,
-  formId,
-  patientId,
-  providerId
+  formId
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const defaultForm: Form = {
+    patientId: '',
+    providerId: '',
+    questionId: ''
+  };
+  const defaultQuestionSet: KeyedQuestionSet = {
+    key: '',
+    name: '',
+    prompt: '',
+    questions: []
+  };
+  const [currentForm, updateCurrentForm] = React.useState(defaultForm);
+  const [currentQuestionSet, updateQuestionSet] =
+    React.useState(defaultQuestionSet);
   const db = useFirestore();
+
+  React.useEffect(() => {
+    getUserForm(db, formId).then((value) =>
+      updateCurrentForm(value.data() as unknown as Form)
+    );
+  }, []);
+
+  React.useEffect(() => {
+    console.log(currentForm);
+    get_question_set(db, currentForm.questionId).then((value) =>
+      updateQuestionSet(value)
+    );
+  }, [currentForm]);
+
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -62,7 +81,13 @@ function PatientForm({
     for (const [key, value] of data.entries()) {
       answerMap.push({ id: key, answer: value as string });
     }
-    uploadResults(db, patientId, providerId, formId, answerMap);
+    uploadResults(
+      db,
+      currentForm.patientId,
+      currentForm.providerId,
+      formId,
+      answerMap
+    );
   };
 
   return (
@@ -78,11 +103,13 @@ function PatientForm({
         <Box component="form" onSubmit={onSubmit} sx={{ paddingTop: '1%' }}>
           <div className={styles.questionheading2}>
             {' '}
-            {questionSet.name}
+            {currentQuestionSet.name}
             {/* <VideocamIcon /> */}
           </div>
-          <div className={styles.questionheading2}>{questionSet.prompt}</div>
-          {questionSet.questions.map((question) => (
+          <div className={styles.questionheading2}>
+            {currentQuestionSet.prompt}
+          </div>
+          {currentQuestionSet.questions.map((question) => (
             <div key={question.key}>
               <div className={styles.questions}>{question.question}</div>
               <FormControl required fullWidth>
