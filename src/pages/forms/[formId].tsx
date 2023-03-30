@@ -2,6 +2,8 @@ import styles from '@/styles/Home.module.css';
 import * as React from 'react';
 import { Button, Box } from '@mui/material/';
 import VideocamIcon from '@mui/icons-material/Videocam';
+import DailyCall from '@/components/Charlie/_test';
+import Drawers from '@/components/Charlie/_drawer';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -48,6 +50,7 @@ function PatientForm({ questionSet, formId, patientId, providerId }) {
           marginRight: '4%'
         }}
       >
+        <Drawers />
         <Box component="form" onSubmit={onSubmit} sx={{ paddingTop: '1%' }}>
           <div className={styles.questionheading2}>
             {' '}
