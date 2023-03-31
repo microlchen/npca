@@ -228,7 +228,7 @@ export default function Individuals({
     if (status !== 'loading') {
       setPatient({ name: data.name });
     }
-  }, [status]);
+  }, [data.name, status]);
 
   // Redirect to login if not logged in
   React.useEffect(() => {
