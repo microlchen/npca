@@ -12,6 +12,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useFirestore } from 'reactfire';
 import Header from '@/components/subpages/header';
 import { FormLayout } from '@/components/subpages/form';
+import { useRouter } from 'next/router';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const formId = ctx.params['formId'] as string;
@@ -40,6 +41,7 @@ function PatientForm({
   const [currentForm, updateCurrentForm] = React.useState(null);
   const [currentQuestionSet, updateQuestionSet] = React.useState(null);
   const db = useFirestore();
+  const router = useRouter();
 
   React.useEffect(() => {
     getUserForm(db, formId).then((value) =>
@@ -69,6 +71,7 @@ function PatientForm({
       formId,
       answerMap
     );
+    router.push('/submit');
   };
 
   return (

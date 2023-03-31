@@ -208,13 +208,7 @@ export default function Individuals({
 
   const onClickForm = async (questionType: QuestionType) => {
     setFormId(
-      await generateQuestionLink(
-        db,
-        patientId,
-        userId,
-        questionType.id,
-        router.basePath
-      )
+      await generateQuestionLink(db, patientId, userId, questionType.id, host)
     );
     handleClickOpen();
   };
