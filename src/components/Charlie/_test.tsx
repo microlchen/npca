@@ -18,7 +18,13 @@ const DailyCall = () => {
     }
   }, []);
 
-  return <iframe ref={videoEl} />;
+    return (
+  <div>
+      <iframe height="1440" width="720"  ref={videoEl} />
+  </div>
+
+  
+  )
 };
 
 export default DailyCall;
