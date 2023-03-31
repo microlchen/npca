@@ -25,7 +25,7 @@ const Drawers = () => {
             backgroundColor: 'grey',
             color: 'white',
             flexGrow: 1,
-            width: '100%'
+            width: '720'
           }
         }}
       >
