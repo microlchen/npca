@@ -1,3 +1,4 @@
+import { Form } from '@/types/forms';
 import {
   KeyedQuestionSet,
   Question,
@@ -9,7 +10,10 @@ import {
   arrayRemove,
   arrayUnion,
   collection,
+  collectionGroup,
   doc,
+  DocumentData,
+  DocumentSnapshot,
   Firestore,
   getDoc,
   getDocFromServer,
@@ -83,8 +87,8 @@ export async function createCompletedForm(
   answerMap: { id: string; answer: string }[]
 ) {
   // Create answer document for a complete form
-  const completedFormsDocument = doc(db, `completed_forms/${formId}`);
-  setDoc(completedFormsDocument, {
+  const formsDocument = doc(db, `forms/${formId}`);
+  updateDoc(formsDocument, {
     answerMap: answerMap,
     timeCompleted: Timestamp.now()
   });
@@ -92,7 +96,7 @@ export async function createCompletedForm(
   // Create top level reference
   const userDocument = doc(db, `users/${providerId}`);
   updateDoc(userDocument, {
-    completed_forms: arrayUnion(formId)
+    completedForms: arrayUnion(formId)
   });
 
   // Create patient level reference for the user
@@ -101,14 +105,14 @@ export async function createCompletedForm(
 
   setDoc(
     patientInfoDocument,
-    { completed_forms: arrayUnion(formId) },
+    { completedForms: arrayUnion(formId) },
     { merge: true }
   );
 
   // Create reference inside patient data
   const patientDocument = doc(db, `patients/${patientId}`);
 
-  updateDoc(patientDocument, { completed_forms: arrayUnion(formId) });
+  updateDoc(patientDocument, { completedForms: arrayUnion(formId) });
 }
 
 export async function removeOutstandingForm(
@@ -120,19 +124,19 @@ export async function removeOutstandingForm(
   // Remove top level reference
   const userDocument = doc(db, `users/${providerId}`);
   updateDoc(userDocument, {
-    outstanding_forms: arrayRemove(formId)
+    outstandingForms: arrayRemove(formId)
   });
 
   // Remove patient level reference
   const patientInfoCollection = collection(userDocument, `patient_info`);
   const patientInfoDocument = doc(patientInfoCollection, patientId);
 
-  updateDoc(patientInfoDocument, { outstanding_forms: arrayRemove(formId) });
+  updateDoc(patientInfoDocument, { outstandingForms: arrayRemove(formId) });
 
   // Remove reference inside patient data
   const patientDocument = doc(db, `patients/${patientId}`);
 
-  updateDoc(patientDocument, { outstanding_forms: arrayRemove(formId) });
+  updateDoc(patientDocument, { outstandingForms: arrayRemove(formId) });
 }
 
 async function createOutstandingForm(
@@ -144,7 +148,7 @@ async function createOutstandingForm(
   // Create top level reference
   const userDocument = doc(db, `users/${providerId}`);
   updateDoc(userDocument, {
-    outstanding_forms: arrayUnion(formId)
+    outstandingForms: arrayUnion(formId)
   });
 
   // create patient level reference
@@ -153,14 +157,46 @@ async function createOutstandingForm(
 
   setDoc(
     patientInfoDocument,
-    { outstanding_forms: arrayUnion(formId) },
+    { outstandingForms: arrayUnion(formId) },
     { merge: true }
   );
 
   // Create reference inside patient data
   const patientDocument = doc(db, `patients/${patientId}`);
 
-  updateDoc(patientDocument, { outstanding_forms: arrayUnion(formId) });
+  updateDoc(patientDocument, { outstandingForms: arrayUnion(formId) });
+}
+
+async function getQuestionName(db: Firestore, id: string): Promise<string> {
+  const question_collection_index = collection(db, generic_questions_index_id);
+  const question = await getDoc(doc(question_collection_index, id));
+  return question.data().name;
+}
+
+export async function getForms(
+  db: Firestore,
+  formIds: string[]
+): Promise<Form[]> {
+  // Create top level reference
+  const userDocument = collection(db, `forms`);
+  const formSnapshots: Promise<DocumentSnapshot<DocumentData>>[] = [];
+  for (const formId of formIds) {
+    formSnapshots.push(getDoc(doc(userDocument, formId)));
+  }
+
+  const snapshots = await Promise.all(formSnapshots);
+  const forms: Promise<Form>[] = snapshots.map(async (snapshot) => ({
+    patientId: snapshot.data().patientId,
+    providerId: snapshot.data().providerId,
+    questionId: snapshot.data().questionId,
+    questionName: await getQuestionName(db, snapshot.data().questionId),
+    timeCreated: snapshot.data().timeCreated,
+    timeCompleted: snapshot.data().timeCompleted,
+    answerMap: snapshot.data().answerMap,
+    id: snapshot.id
+  }));
+
+  return await Promise.all(forms);
 }
 
 export async function generateQuestionForm(
@@ -173,7 +209,8 @@ export async function generateQuestionForm(
   const form = await addDoc(formCollection, {
     patientId: patientId,
     providerId: providerId,
-    questionId: questionId
+    questionId: questionId,
+    timeCreated: Timestamp.now()
   });
   // do not wait for this result!
   createOutstandingForm(db, patientId, providerId, form.id);
@@ -184,10 +221,11 @@ export async function generateQuestionLink(
   db: Firestore,
   patientId: string,
   providerId: string,
-  questionId: string
+  questionId: string,
+  baseUrl: string
 ) {
   const id = await generateQuestionForm(db, patientId, providerId, questionId);
-  return `https://npca-delta.vercel.app/forms/${id}`;
+  return `${baseUrl}/forms/${id}`;
 }
 
 export async function getUserForm(db: Firestore, formId: string) {

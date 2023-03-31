@@ -1,8 +1,7 @@
 import * as React from 'react';
 import nookies from 'nookies';
 import styles from '@/styles/Home.module.css';
-import { useState } from 'react';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useState, useReducer } from 'react';
 
 import {
   ListItemButton,
@@ -22,23 +21,28 @@ import {
 } from '@mui/material/';
 import Header from '@/components/subpages/header';
 import { getServerLoggedIn } from '@/data/user';
-import getFirebaseApp from '@/firebase/initFirebase';
 import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
 import { Patient } from '@/types/users';
-import { collection, doc, getFirestore } from 'firebase/firestore';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { Firestore, collection, doc } from 'firebase/firestore';
+import {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+  NextApiRequest
+} from 'next';
 import {
   generateQuestionLink,
+  getForms,
   get_generic_question_types
 } from '@/data/questions';
 import { QuestionType } from '@/types/questions';
 import { useRouter } from 'next/router';
 import {
   useFirestore,
-  useFirestoreCollectionData,
   useFirestoreDocData,
   useFirestoreDocDataOnce
 } from 'reactfire';
+import { Form } from '@/types/forms';
+import { FormDialog } from '@/components/subpages/formDialog';
 
 function Redirect() {
   return (
@@ -49,31 +53,148 @@ function Redirect() {
   );
 }
 
+function CompletedForms({
+  host,
+  completedForms
+}: {
+  host: string;
+  completedForms: Form[];
+}) {
+  const router = useRouter();
+  const handleClick = (formId: string) => {
+    router.push(`/completedForm/${formId}`);
+  };
+
+  return (
+    <>
+      {completedForms.length > 0 && (
+        <>
+          <Typography variant="h4">Completed Forms</Typography>
+          <List>
+            {completedForms.map((completedForm) => (
+              <Box key={completedForm.id}>
+                <ListItemButton
+                  sx={{
+                    backgroundColor: '#34497980',
+                    borderRadius: 50,
+                    mt: '1%'
+                  }}
+                  onClick={() => handleClick(completedForm.id)}
+                >
+                  {`${
+                    completedForm.questionName
+                  } form completed ${completedForm.timeCompleted
+                    .toDate()
+                    .toLocaleString()}`}
+                </ListItemButton>
+              </Box>
+            ))}
+          </List>
+        </>
+      )}
+    </>
+  );
+}
+
+function OutstandingForms({
+  host,
+  outstandingForms
+}: {
+  host: string;
+  outstandingForms: Form[];
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [formId, setFormId] = useState<string>('');
+
+  const handleClickOpen = (formId: string) => {
+    // console.log('base path', req);
+    setFormId(`${host}/forms/${formId}`);
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <FormDialog
+        title={'Resend Form'}
+        open={open}
+        handleClose={handleClose}
+        formId={formId}
+      />
+      <>
+        <Typography variant="h4">Sent Forms</Typography>
+        <List>
+          {outstandingForms.map((outstandingForm) => (
+            <Box key={outstandingForm.id}>
+              <ListItemButton
+                sx={{
+                  backgroundColor: '#34497980',
+                  borderRadius: 50,
+                  mt: '1%'
+                }}
+                onClick={() => handleClickOpen(outstandingForm.id)}
+              >
+                {`${
+                  outstandingForm.questionName
+                } form created ${outstandingForm.timeCreated
+                  .toDate()
+                  .toLocaleString()}`}
+              </ListItemButton>
+            </Box>
+          ))}
+        </List>
+      </>
+    </>
+  );
+}
+
 function PatientForms({
+  host,
   patientId,
   userId
 }: {
+  host: string;
   patientId: string;
   userId: string;
 }) {
   const db = useFirestore();
-  const [outstandingForms, setOutstandingForms] = useState([] as string[]);
-  const [completedForms, setCompletedForms] = useState([] as string[]);
+  const [outstandingForms, setOutstandingForms] = useState([] as Form[]);
+  const [completedForms, setCompletedForms] = useState([] as Form[]);
   const { status, data } = useFirestoreDocData(
     doc(db, `users/${userId}/patient_info/${patientId}`)
   );
 
   React.useEffect(() => {
     if (status !== 'loading') {
-      setCompletedForms(data.completed_forms);
-      setOutstandingForms(data.outstanding_forms);
+      if (data.outstandingForms) {
+        getForms(db, data.outstandingForms).then((form) =>
+          setOutstandingForms(form)
+        );
+      }
+      if (data.completedForms) {
+        getForms(db, data.completedForms).then((form) =>
+          setCompletedForms(form)
+        );
+      }
     }
-  }, [status]);
+  }, [status, data]);
 
-  console.log(outstandingForms);
-  console.log(completedForms);
+  React.useEffect(() => {
+    console.log(outstandingForms);
+  }, [outstandingForms]);
+  React.useEffect(() => {
+    console.log(completedForms);
+  }, [completedForms]);
 
-  return <div></div>;
+  return (
+    <>
+      <OutstandingForms host={host} outstandingForms={outstandingForms} />
+      <Box sx={{ mb: '2%' }}></Box>
+      <CompletedForms host={host} completedForms={completedForms} />
+    </>
+  );
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
@@ -81,9 +202,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const adminAuth = getAdminAuth();
 
   const user = await getServerLoggedIn(cookies, adminAuth);
-
   return {
     props: {
+      host: ctx.req.headers.host,
       userId: user.userId,
       isLoggedIn: user.isLoggedIn
     }
@@ -91,6 +212,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 };
 
 export default function Individuals({
+  host,
   userId,
   isLoggedIn
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -118,7 +240,13 @@ export default function Individuals({
 
   const onClickForm = async (questionType: QuestionType) => {
     setFormId(
-      await generateQuestionLink(db, patientId, userId, questionType.id)
+      await generateQuestionLink(
+        db,
+        patientId,
+        userId,
+        questionType.id,
+        router.basePath
+      )
     );
     handleClickOpen();
   };
@@ -144,42 +272,12 @@ export default function Individuals({
   return isLoggedIn ? (
     <>
       <Header />
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add New Patient</DialogTitle>
-        <DialogContent>
-          <Typography>Send this form to your patient:</Typography>
-          {/* <Typography>{formId}</Typography> */}
-          <FormControl fullWidth variant="standard">
-            <InputLabel htmlFor="input-with-icon-adornment">
-              Copy to clipboard
-            </InputLabel>
-            <Input
-              id="input-with-icon-adornment"
-              value={formId}
-              readOnly
-              fullWidth
-              role="textbox"
-              sx={{
-                width: '500px'
-              }}
-              startAdornment={
-                <InputAdornment position="start">
-                  <IconButton
-                    onClick={() => {
-                      navigator.clipboard.writeText(formId);
-                    }}
-                  >
-                    <ContentCopyIcon />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
-        </DialogActions>
-      </Dialog>
+      <FormDialog
+        title={'Send New Form'}
+        open={open}
+        handleClose={handleClose}
+        formId={formId}
+      />
       <div className={styles.individualpatientboxspacing}>
         <Typography variant="h3" component="h2">
           Patient: {patient.name}
@@ -214,7 +312,8 @@ export default function Individuals({
             </Box>
           ))}
         </List>
-        <PatientForms patientId={patientId} userId={userId} />
+        <Box sx={{ mb: '2%' }}></Box>
+        <PatientForms host={host} patientId={patientId} userId={userId} />
         <Box sx={{ mb: '2%' }}></Box>
       </div>
     </>

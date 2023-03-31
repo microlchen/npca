@@ -1,7 +1,6 @@
 import styles from '@/styles/Home.module.css';
 import * as React from 'react';
 import { Button, Box } from '@mui/material/';
-import VideocamIcon from '@mui/icons-material/Videocam';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,9 +16,8 @@ import { Form, KeyedQuestionSet } from '@/types/questions';
 import { Firestore } from 'firebase/firestore';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useFirestore } from 'reactfire';
-import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
-import nookies from 'nookies';
-import { getServerLoggedIn } from '@/data/user';
+import Header from '@/components/subpages/header';
+import { FormLayout } from '@/components/subpages/form';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const formId = ctx.params['formId'] as string;
@@ -45,20 +43,8 @@ async function uploadResults(
 function PatientForm({
   formId
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const defaultForm: Form = {
-    patientId: '',
-    providerId: '',
-    questionId: ''
-  };
-  const defaultQuestionSet: KeyedQuestionSet = {
-    key: '',
-    name: '',
-    prompt: '',
-    questions: []
-  };
-  const [currentForm, updateCurrentForm] = React.useState(defaultForm);
-  const [currentQuestionSet, updateQuestionSet] =
-    React.useState(defaultQuestionSet);
+  const [currentForm, updateCurrentForm] = React.useState(null);
+  const [currentQuestionSet, updateQuestionSet] = React.useState(null);
   const db = useFirestore();
 
   React.useEffect(() => {
@@ -68,7 +54,7 @@ function PatientForm({
   }, []);
 
   React.useEffect(() => {
-    if (currentForm.questionId) {
+    if (currentForm && currentForm.questionId) {
       get_question_set(db, currentForm.questionId).then((value) =>
         updateQuestionSet(value)
       );
@@ -93,55 +79,13 @@ function PatientForm({
 
   return (
     <>
-      <Box
-        sx={{
-          marginTop: '5%',
-          marginLeft: '4%',
-          backgroundColor: 'white',
-          marginRight: '4%'
-        }}
-      >
-        <Box component="form" onSubmit={onSubmit} sx={{ paddingTop: '1%' }}>
-          <div className={styles.questionheading2}>
-            {' '}
-            {currentQuestionSet.name}
-            {/* <VideocamIcon /> */}
-          </div>
-          <div className={styles.questionheading2}>
-            {currentQuestionSet.prompt}
-          </div>
-          {currentQuestionSet.questions.map((question) => (
-            <div key={question.key}>
-              <div className={styles.questions}>{question.question}</div>
-              <FormControl required fullWidth>
-                <InputLabel id="demo-simple-select-label" required>
-                  Answer
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  name={question.key}
-                  label="Answer"
-                  defaultValue={''}
-                >
-                  {question.responses.map((response, index) => (
-                    <MenuItem key={response} value={index}>
-                      {response}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-          ))}
-          <Box
-            sx={{ display: 'flex', justifyContent: 'center', marginLeft: -7 }}
-          >
-            <Button type="submit" className={styles.submit}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+      <Header />
+      <FormLayout
+        onSubmit={onSubmit}
+        currentQuestionSet={currentQuestionSet}
+        answers={[]}
+        subtitle=""
+      />
     </>
   );
 }

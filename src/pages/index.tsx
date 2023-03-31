@@ -59,6 +59,7 @@ export default function Login({
   }, [router]);
 
   const form: React.MutableRefObject<HTMLFormElement> = useRef();
+  const checkboxRef: React.MutableRefObject<HTMLInputElement> = useRef();
 
   const [signUp, signUpState] = useSignUpWithEmailAndPassword();
   const signUpLoading = signUpState.loading;
@@ -93,14 +94,18 @@ export default function Login({
 
       if (!email) {
         updateEmailValidation(true);
+        console.log('Email validation bad');
         error = true;
       }
       if (!password) {
         updatePasswordValidation(true);
+        console.log('Email password bad');
         error = true;
       }
-      updateTOSValidation(termsOfServiceCheckbox);
+
       if (!termsOfServiceCheckbox) {
+        updateTOSValidation(true);
+        console.log('Checkbox bad');
         error = true;
       }
 
@@ -108,12 +113,17 @@ export default function Login({
         if (submitter == Submitter.SignUp) {
           return signUp(email, password);
         } else {
+          console.log('signin');
           return signIn(email, password);
         }
+      } else {
+        console.log('Error');
       }
     },
-    [signUpLoading, signUp, signIn]
+    [signUpLoading, signUp, signIn, termsOfServiceCheckbox]
   );
+
+  useEffect(() => console.log(signInError), [signInError]);
 
   // Login if login cached
   useEffect(() => {
@@ -206,6 +216,7 @@ export default function Login({
                   control={
                     <Checkbox
                       required
+                      ref={checkboxRef}
                       sx={{
                         color: TOSValidation ? red[800] : undefined,
                         '&.Mui-checked': {

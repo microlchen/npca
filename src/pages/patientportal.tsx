@@ -33,10 +33,6 @@ function Dashboard({
   isLoggedIn
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  if (!isLoggedIn) {
-    router.push('');
-  }
-
   const db = useFirestore();
 
   const addPatient = React.useCallback<(patient: Patient) => Promise<void>>(
@@ -71,6 +67,12 @@ function Dashboard({
       });
     }
   }, [status, data, db]);
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      router.push('');
+    }
+  }, [isLoggedIn]);
 
   const onClickPatient = (patientId: string) => {
     router.push(`/patient/${patientId}`);

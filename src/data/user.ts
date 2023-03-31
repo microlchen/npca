@@ -73,6 +73,7 @@ export async function getServerLoggedIn(
       userId: user.uid
     };
   } catch (error) {
+    console.log(error);
     return {
       isLoggedIn: false,
       userId: null
