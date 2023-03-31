@@ -1,11 +1,5 @@
-import styles from '@/styles/Home.module.css';
 import * as React from 'react';
-import { Button, Box } from '@mui/material/';
-
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import Drawers from '@/components/Charlie/_drawer';
 import {
   createCompletedForm,
   get_question_set,
@@ -80,6 +74,7 @@ function PatientForm({
   return (
     <>
       <Header />
+      <Drawers />
       <FormLayout
         onSubmit={onSubmit}
         currentQuestionSet={currentQuestionSet}
