@@ -72,7 +72,7 @@ function Dashboard({
     if (!isLoggedIn) {
       router.push('');
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, router]);
 
   const onClickPatient = (patientId: string) => {
     router.push(`/patient/${patientId}`);

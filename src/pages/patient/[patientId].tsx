@@ -1,34 +1,15 @@
 import * as React from 'react';
 import nookies from 'nookies';
 import styles from '@/styles/Home.module.css';
-import { useState, useReducer } from 'react';
+import { useState } from 'react';
 
-import {
-  ListItemButton,
-  List,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  FormControl,
-  InputLabel,
-  Input,
-  InputAdornment,
-  IconButton
-} from '@mui/material/';
+import { ListItemButton, List, Box, Typography } from '@mui/material/';
 import Header from '@/components/subpages/header';
 import { getServerLoggedIn } from '@/data/user';
 import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
 import { Patient } from '@/types/users';
-import { Firestore, collection, doc } from 'firebase/firestore';
-import {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-  NextApiRequest
-} from 'next';
+import { collection, doc } from 'firebase/firestore';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import {
   generateQuestionLink,
   getForms,
@@ -53,13 +34,7 @@ function Redirect() {
   );
 }
 
-function CompletedForms({
-  host,
-  completedForms
-}: {
-  host: string;
-  completedForms: Form[];
-}) {
+function CompletedForms({ completedForms }: { completedForms: Form[] }) {
   const router = useRouter();
   const handleClick = (formId: string) => {
     router.push(`/completedForm/${formId}`);
@@ -179,20 +154,13 @@ function PatientForms({
         );
       }
     }
-  }, [status, data]);
-
-  React.useEffect(() => {
-    console.log(outstandingForms);
-  }, [outstandingForms]);
-  React.useEffect(() => {
-    console.log(completedForms);
-  }, [completedForms]);
+  }, [db, status, data]);
 
   return (
     <>
       <OutstandingForms host={host} outstandingForms={outstandingForms} />
       <Box sx={{ mb: '2%' }}></Box>
-      <CompletedForms host={host} completedForms={completedForms} />
+      <CompletedForms completedForms={completedForms} />
     </>
   );
 }
@@ -226,7 +194,7 @@ export default function Individuals({
 
   React.useEffect(() => {
     get_generic_question_types(db).then(updateQuestionTypes);
-  }, [isLoggedIn]);
+  }, [db, isLoggedIn]);
 
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -260,7 +228,7 @@ export default function Individuals({
     if (status !== 'loading') {
       setPatient({ name: data.name });
     }
-  }, [status]);
+  }, [data.name, status]);
 
   // Redirect to login if not logged in
   React.useEffect(() => {

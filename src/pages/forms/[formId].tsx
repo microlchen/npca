@@ -6,7 +6,7 @@ import {
   getUserForm,
   removeOutstandingForm
 } from '@/data/questions';
-import { Form, KeyedQuestionSet } from '@/types/questions';
+import { Form } from '@/types/questions';
 import { Firestore } from 'firebase/firestore';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useFirestore } from 'reactfire';
@@ -45,7 +45,7 @@ function PatientForm({
     getUserForm(db, formId).then((value) =>
       updateCurrentForm(value.data() as unknown as Form)
     );
-  }, []);
+  }, [db, formId]);
 
   React.useEffect(() => {
     if (currentForm && currentForm.questionId) {
@@ -53,7 +53,7 @@ function PatientForm({
         updateQuestionSet(value)
       );
     }
-  }, [currentForm]);
+  }, [db, currentForm]);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

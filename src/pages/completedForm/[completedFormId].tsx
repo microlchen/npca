@@ -34,7 +34,7 @@ export default function CompletedForm({
     getUserForm(db, formId).then((value) =>
       updateCurrentForm(value.data() as unknown as Form)
     );
-  }, []);
+  }, [db, formId]);
 
   useEffect(() => {
     if (currentForm && currentForm.questionId) {
@@ -42,7 +42,7 @@ export default function CompletedForm({
         updateQuestionSet(value)
       );
     }
-  }, [currentForm]);
+  }, [db, currentForm]);
 
   useEffect(() => {
     if (status != 'loading') {

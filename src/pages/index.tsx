@@ -180,7 +180,7 @@ export default function Login({
                   signUpError != undefined ||
                   signInError != undefined
                 }
-                onChange={(_) => {
+                onChange={() => {
                   updateEmailValidation(false);
                 }}
                 required
@@ -198,7 +198,7 @@ export default function Login({
                   signUpError != undefined ||
                   signInError != undefined
                 }
-                onChange={(_) => {
+                onChange={() => {
                   updatePasswordValidation(false);
                 }}
                 required
