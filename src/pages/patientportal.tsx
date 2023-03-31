@@ -28,10 +28,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-function Dashboard({
-  userId,
-  isLoggedIn
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function Portal({ userId }: { userId: string }) {
   const router = useRouter();
   const db = useFirestore();
 
@@ -68,55 +65,63 @@ function Dashboard({
     }
   }, [status, data, db]);
 
-  React.useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('');
-    }
-  }, [isLoggedIn, router]);
-
   const onClickPatient = (patientId: string) => {
     router.push(`/patient/${patientId}`);
   };
 
   return (
+    <div>
+      <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
+        <Box sx={{ mt: '1%' }}></Box>
+        <h1 className={styles.mainheading}>Dashboard</h1>
+        <Box sx={{ mt: '0.5%', mb: '1%' }}>
+          <NewPatientFormDialog callback={addPatient} />
+        </Box>
+        <TextField
+          variant="filled"
+          sx={{ backgroundColor: 'white', borderRadius: 5 }}
+          label="Search for Patients"
+          placeholder="Enter Patient Name"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{ disableUnderline: true }}
+        />
+        <Box sx={{ mb: '2%' }}></Box>
+        <ul>
+          {dataFiltered.map((patient: KeyedPatient) => (
+            <Box key={patient.name}>
+              <ListItemButton
+                sx={{
+                  backgroundColor: '#34497980',
+                  borderRadius: 50,
+                  mt: '1%'
+                }}
+                onClick={() => onClickPatient(patient.id)}
+              >
+                {patient.name}
+              </ListItemButton>
+            </Box>
+          )) ?? 'No patients'}
+        </ul>
+      </Box>
+    </div>
+  );
+}
+
+function Dashboard({
+  userId,
+  isLoggedIn
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      router.push('/');
+    }
+  }, [isLoggedIn, router]);
+
+  return (
     <>
       <Header />
-      {/* <GuardedPage> */}
-      <div>
-        <Box sx={{ ml: '5%', mt: '2%', mr: '5%' }}>
-          <Box sx={{ mt: '1%' }}></Box>
-          <h1 className={styles.mainheading}>Dashboard</h1>
-          <Box sx={{ mt: '0.5%', mb: '1%' }}>
-            <NewPatientFormDialog callback={addPatient} />
-          </Box>
-          <TextField
-            variant="filled"
-            sx={{ backgroundColor: 'white', borderRadius: 5 }}
-            label="Search for Patients"
-            placeholder="Enter Patient Name"
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{ disableUnderline: true }}
-          />
-          <Box sx={{ mb: '2%' }}></Box>
-          <ul>
-            {dataFiltered.map((patient: KeyedPatient) => (
-              <Box key={patient.name}>
-                <ListItemButton
-                  sx={{
-                    backgroundColor: '#34497980',
-                    borderRadius: 50,
-                    mt: '1%'
-                  }}
-                  onClick={() => onClickPatient(patient.id)}
-                >
-                  {patient.name}
-                </ListItemButton>
-              </Box>
-            )) ?? 'No patients'}
-          </ul>
-        </Box>
-      </div>
-      {/* </GuardedPage> */}
+      {isLoggedIn && <Portal userId={userId} />}
     </>
   );
 }

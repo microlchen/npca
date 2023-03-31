@@ -130,7 +130,7 @@ export default function Login({
     if (isLoggedIn) {
       onLogin();
     }
-  });
+  }, [isLoggedIn]);
 
   return !isLoggedIn ? (
     <Box
