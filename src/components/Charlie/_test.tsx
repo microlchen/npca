@@ -16,7 +16,7 @@ const DailyCall = () => {
       );
       callFrame.join();
     }
-  }, [videoEl.current]);
+  }, []);
 
   return <iframe ref={videoEl} />;
 };

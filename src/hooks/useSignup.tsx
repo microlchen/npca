@@ -28,7 +28,7 @@ export function useSignUpWithEmailAndPassword() {
         );
 
         setData(cred);
-        await create_user_set(db, email, cred.user.uid);
+        create_user_set(db, email, cred.user.uid);
       } catch (error) {
         setError(error as FirebaseError);
       }

@@ -1,34 +1,18 @@
 import * as React from 'react';
 import nookies from 'nookies';
-import {
-  TextField,
-  Autocomplete,
-  Box,
-  ListItemButton,
-  useAutocomplete
-} from '@mui/material/';
+import { TextField, Box, ListItemButton } from '@mui/material/';
 import { useState } from 'react';
-import GuardedPage from '@/components/GuardedPage';
 import styles from '@/styles/Home.module.css';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
 import Header from '@/components/subpages/header';
-import { addPatientId, getPatientIds, getServerLoggedIn } from '@/data/user';
-import { Firestore, collection, doc, getFirestore } from 'firebase/firestore';
+import { addPatientId, getServerLoggedIn } from '@/data/user';
+import { collection, doc } from 'firebase/firestore';
 import { createPatient, getPatientsData } from '@/data/patients';
-import getFirebaseApp from '@/firebase/initFirebase';
 import NewPatientFormDialog from '@/components/subpages/NewPatient';
 import { KeyedPatient, Patient } from '@/types/users';
 import { useFirestore, useFirestoreDocData } from 'reactfire';
 import { useRouter } from 'next/router';
-
-async function getAllPatients(
-  db: Firestore,
-  userId: string
-): Promise<KeyedPatient[]> {
-  const patients = await getPatientsData(db, await getPatientIds(db, userId));
-  return patients;
-}
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const cookies = nookies.get(ctx);
@@ -36,15 +20,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   const user = await getServerLoggedIn(cookies, adminAuth);
 
-  let patients: KeyedPatient[] = [];
-  if (user.isLoggedIn) {
-    const db = getFirebaseApp();
-    patients = await getAllPatients(getFirestore(db), user.userId);
-  }
-
   return {
     props: {
-      patients: patients,
       userId: user.userId,
       isLoggedIn: user.isLoggedIn
     }
@@ -52,15 +29,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 };
 
 function Dashboard({
-  patients,
   userId,
   isLoggedIn
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  if (!isLoggedIn) {
-    router.push('');
-  }
-
   const db = useFirestore();
 
   const addPatient = React.useCallback<(patient: Patient) => Promise<void>>(
@@ -71,7 +43,7 @@ function Dashboard({
     [db, userId]
   );
 
-  const [patientsState, setPatients] = useState(patients);
+  const [patientsState, setPatients] = useState([] as KeyedPatient[]);
   const [searchQuery, setSearchQuery] = useState('');
   const filterData = (query: string, data: KeyedPatient[]) => {
     if (!query) {
@@ -95,6 +67,12 @@ function Dashboard({
       });
     }
   }, [status, data, db]);
+
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      router.push('');
+    }
+  }, [isLoggedIn, router]);
 
   const onClickPatient = (patientId: string) => {
     router.push(`/patient/${patientId}`);

@@ -7,27 +7,59 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-  Link
+  Link,
+  FormControl
 } from '@mui/material/';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useRef } from 'react';
+import nookies from 'nookies';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSignUpWithEmailAndPassword } from '@/hooks/useSignup';
 import { useRouter } from 'next/router';
 import { useSignInWithEmailAndPassword } from '@/hooks/useSignin';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { getServerLoggedIn } from '@/data/user';
+import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
+import { red } from '@mui/material/colors';
 
 enum Submitter {
   SignIn,
   SignUp
 }
 
-export default function Login() {
+function Loading() {
+  return (
+    <div className="splash-screen">
+      Signing in.
+      <div className="loading-dot">.</div>
+    </div>
+  );
+}
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const cookies = nookies.get(ctx);
+  const adminAuth = getAdminAuth();
+
+  const user = await getServerLoggedIn(cookies, adminAuth);
+
+  return {
+    props: {
+      isLoggedIn: user.isLoggedIn
+    }
+  };
+};
+
+export default function Login({
+  isLoggedIn
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
+
   const onLogin = useCallback(() => {
     console.log('successfully signed in');
     router.push('patientportal');
   }, [router]);
 
   const form: React.MutableRefObject<HTMLFormElement> = useRef();
+  const checkboxRef: React.MutableRefObject<HTMLInputElement> = useRef();
 
   const [signUp, signUpState] = useSignUpWithEmailAndPassword();
   const signUpLoading = signUpState.loading;
@@ -36,6 +68,12 @@ export default function Login() {
   const [signIn, signInState] = useSignInWithEmailAndPassword();
   const signInLoading = signInState.loading;
   const signInError = signInState.error;
+  const [termsOfServiceCheckbox, updateTermsofServiceCheckbox] =
+    useState(false);
+
+  const [emailValidation, updateEmailValidation] = useState(false);
+  const [passwordValidation, updatePasswordValidation] = useState(false);
+  const [TOSValidation, updateTOSValidation] = useState(false);
 
   useEffect(() => {
     if (signUpState.success || signInState.success) {
@@ -52,17 +90,49 @@ export default function Login() {
       const data = new FormData(form.current);
       const email = data.get('email') as string;
       const password = data.get('password') as string;
+      let error = false;
 
-      if (submitter == Submitter.SignUp) {
-        return signUp(email, password);
+      if (!email) {
+        updateEmailValidation(true);
+        console.log('Email validation bad');
+        error = true;
+      }
+      if (!password) {
+        updatePasswordValidation(true);
+        console.log('Email password bad');
+        error = true;
+      }
+
+      if (!termsOfServiceCheckbox) {
+        updateTOSValidation(true);
+        console.log('Checkbox bad');
+        error = true;
+      }
+
+      if (!error) {
+        if (submitter == Submitter.SignUp) {
+          return signUp(email, password);
+        } else {
+          console.log('signin');
+          return signIn(email, password);
+        }
       } else {
-        return signIn(email, password);
+        console.log('Error');
       }
     },
-    [signUpLoading, signUp, signIn]
+    [signUpLoading, signUp, signIn, termsOfServiceCheckbox]
   );
 
-  return (
+  useEffect(() => console.log(signInError), [signInError]);
+
+  // Login if login cached
+  useEffect(() => {
+    if (isLoggedIn) {
+      onLogin();
+    }
+  });
+
+  return !isLoggedIn ? (
     <Box
       sx={{
         width: '35%',
@@ -105,6 +175,14 @@ export default function Login() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                error={
+                  emailValidation ||
+                  signUpError != undefined ||
+                  signInError != undefined
+                }
+                onChange={() => {
+                  updateEmailValidation(false);
+                }}
                 required
                 fullWidth
                 id="email"
@@ -115,6 +193,14 @@ export default function Login() {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={
+                  passwordValidation ||
+                  signUpError != undefined ||
+                  signInError != undefined
+                }
+                onChange={() => {
+                  updatePasswordValidation(false);
+                }}
                 required
                 fullWidth
                 name="password"
@@ -125,19 +211,37 @@ export default function Login() {
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox required value="allowExtraEmails" color="primary" />
-                }
-                label={
-                  <Typography fontSize="medium" color="black">
-                    I accept the &nbsp;
-                    <Link href="./login">{'Terms of Service'}</Link> &nbsp;and
-                    the&nbsp; <Link href="./login">{'Privacy Policy'}</Link>{' '}
-                    &nbsp;of this page.
-                  </Typography>
-                }
-              />
+              <FormControl required>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      required
+                      ref={checkboxRef}
+                      sx={{
+                        color: TOSValidation ? red[800] : undefined,
+                        '&.Mui-checked': {
+                          color: TOSValidation ? red[600] : undefined
+                        }
+                      }}
+                      onChange={(value) => {
+                        updateTermsofServiceCheckbox(value.target.checked);
+                        updateTOSValidation(false);
+                      }}
+                      name="termsOfServiceCheckbox"
+                      id="termsOfServiceCheckbox"
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Typography fontSize="medium" color="black">
+                      I accept the &nbsp;
+                      <Link href="./login">{'Terms of Service'}</Link> &nbsp;and
+                      the&nbsp; <Link href="./login">{'Privacy Policy'}</Link>{' '}
+                      &nbsp;of this page.
+                    </Typography>
+                  }
+                />
+              </FormControl>
             </Grid>
           </Grid>
           <Button
@@ -175,5 +279,7 @@ export default function Login() {
         </Box>
       </Box>
     </Box>
+  ) : (
+    <Loading />
   );
 }

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Drawer, Button } from '@mui/material/';
 import DailyCall from '@/components/Charlie/_test';
 
-const Drawers = (props) => {
+const Drawers = () => {
   const [anchor, set] = useState(null);
   const open = (event) => {
     set(event.currentTarget);
@@ -29,7 +29,6 @@ const Drawers = (props) => {
           }
         }}
       >
-        {/* {props.object} */}
         Hi
         <DailyCall />
       </Drawer>

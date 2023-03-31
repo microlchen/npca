@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "es2022",
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -17,6 +18,11 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/patientportal.jsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/pages/patientportal.jsx"
+  ],
   "exclude": ["node_modules"]
 }

@@ -20,10 +20,13 @@ function CookieSetter({ children }) {
   useEffect(() => {
     return getAuth().onIdTokenChanged(async (user) => {
       if (!user) {
-        nookies.set(undefined, 'token', '', { path: '/' });
+        nookies.set(undefined, 'token', '', { path: '/', sameSite: 'strict' });
       } else {
         const token = await user.getIdToken();
-        nookies.set(undefined, 'token', token, { path: '/' });
+        nookies.set(undefined, 'token', token, {
+          path: '/',
+          sameSite: 'strict'
+        });
       }
     });
   }, []);
