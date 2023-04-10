@@ -1,47 +1,39 @@
 import * as React from 'react';
-import nookies from 'nookies';
 import { TextField, Box, ListItemButton } from '@mui/material/';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from '@/styles/Home.module.css';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { getAdminAuth } from '@/firebase/initFirebaseAdmin';
 import Header from '@/components/subpages/header';
-import { addPatientId, getServerLoggedIn } from '@/data/user';
-import { collection, doc } from 'firebase/firestore';
+import { addPatientId, subscribeToUser } from '@/data/user';
+import {
+  DocumentData,
+  DocumentSnapshot,
+  Unsubscribe
+} from 'firebase/firestore';
 import { createPatient, getPatientsData } from '@/data/patients';
 import NewPatientFormDialog from '@/components/subpages/NewPatient';
 import { KeyedPatient, Patient } from '@/types/users';
-import { useFirestore, useFirestoreDocData } from 'reactfire';
+import { useFirestore, useUser } from 'reactfire';
 import { useRouter } from 'next/router';
+import GuardedPage from '@/components/subpages/GuardedPage';
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const cookies = nookies.get(ctx);
-  const adminAuth = getAdminAuth();
-
-  const user = await getServerLoggedIn(cookies, adminAuth);
-
-  return {
-    props: {
-      userId: user.userId,
-      isLoggedIn: user.isLoggedIn
-    }
-  };
-};
-
-function Portal({ userId }: { userId: string }) {
+function Portal() {
   const router = useRouter();
   const db = useFirestore();
+  const { data: userData, status: userStatus } = useUser();
+  const [patientsState, setPatients] = useState([] as KeyedPatient[]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userDocument, setUserDocument] = useState(null);
 
   const addPatient = React.useCallback<(patient: Patient) => Promise<void>>(
     async (patient) => {
-      const uid = await createPatient(db, patient);
-      addPatientId(db, userId, uid);
+      if (userStatus === 'success') {
+        const uid = await createPatient(db, patient);
+        addPatientId(db, userData.uid, uid);
+      }
     },
-    [db, userId]
+    [db, userData, userStatus]
   );
 
-  const [patientsState, setPatients] = useState([] as KeyedPatient[]);
-  const [searchQuery, setSearchQuery] = useState('');
   const filterData = (query: string, data: KeyedPatient[]) => {
     if (!query) {
       return data;
@@ -53,17 +45,28 @@ function Portal({ userId }: { userId: string }) {
   };
   const dataFiltered = filterData(searchQuery, patientsState);
 
-  const { status, data } = useFirestoreDocData(
-    doc(collection(db, 'users'), userId)
-  );
+  const documentSubscriber = (snapshot: DocumentSnapshot<DocumentData>) => {
+    setUserDocument(snapshot.data());
+  };
 
-  React.useEffect(() => {
-    if (status !== 'loading') {
-      getPatientsData(db, data.patients).then((patients) => {
+  useEffect(() => {
+    if (userStatus === 'success') {
+      const unsubscriber = subscribeToUser(
+        db,
+        documentSubscriber,
+        userData.uid
+      );
+      return unsubscriber;
+    }
+  }, [db, userData, userStatus]);
+
+  useEffect(() => {
+    if (userDocument !== null) {
+      getPatientsData(db, userDocument.patients).then((patients) => {
         setPatients(patients);
       });
     }
-  }, [status, data, db]);
+  }, [db, userDocument]);
 
   const onClickPatient = (patientId: string) => {
     router.push(`/patient/${patientId}`);
@@ -107,21 +110,15 @@ function Portal({ userId }: { userId: string }) {
   );
 }
 
-function Dashboard({
-  userId,
-  isLoggedIn
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const router = useRouter();
-  React.useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/');
-    }
-  }, [isLoggedIn, router]);
-
+function Dashboard() {
   return (
     <>
-      <Header />
-      {isLoggedIn && <Portal userId={userId} />}
+      <GuardedPage inverted={false} destination={'/'}>
+        <>
+          <Header />
+          <Portal />
+        </>
+      </GuardedPage>
     </>
   );
 }

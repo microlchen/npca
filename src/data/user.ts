@@ -1,12 +1,16 @@
 import { Auth } from 'firebase-admin/auth';
 import {
+  DocumentData,
+  DocumentSnapshot,
   Firestore,
   arrayUnion,
   collection,
   doc,
   getDoc,
+  onSnapshot,
   setDoc,
-  updateDoc
+  updateDoc,
+  Unsubscribe
 } from 'firebase/firestore';
 
 export async function create_user_set(
@@ -22,6 +26,19 @@ export async function create_user_set(
     outstanding_forms: [],
     completed_forms: []
   });
+}
+
+export function subscribeToUser(
+  db: Firestore,
+  subscriber: (snapshot: DocumentSnapshot<DocumentData>) => void,
+  uid: string
+): Unsubscribe {
+  const userCollection = collection(db, 'users');
+  const userDocument = doc(userCollection, uid);
+  console.log('onSnapshot', userDocument, uid);
+  return onSnapshot(userDocument, subscriber, (error) =>
+    console.log('ERROR', error)
+  );
 }
 
 export async function getPatientIds(

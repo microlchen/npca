@@ -24,7 +24,7 @@ import {
 const generic_questions_index_id = 'generic_questions_index';
 const generic_questions_id = 'generic_questions';
 
-export async function create_question_set(
+export async function createQuestionSet(
   db: Firestore,
   name: string,
   questions: Question[]
@@ -46,7 +46,7 @@ export async function create_question_set(
   }
 }
 
-export async function get_generic_question_types(
+export async function getGenericQuestionTypes(
   db: Firestore
 ): Promise<QuestionType[]> {
   const question_collection_index = collection(db, generic_questions_index_id);
@@ -60,14 +60,15 @@ export async function get_generic_question_types(
   return question_types;
 }
 
-export async function get_question_set(
+export async function getQuestionSet(
   db: Firestore,
   id: string
 ): Promise<KeyedQuestionSet> {
   const question_collection = collection(db, generic_questions_id);
 
-  console.log(id);
+  console.log(id, question_collection);
   const querySnapshot = await getDoc(doc(question_collection, id));
+  console.log(querySnapshot.data());
   const value: KeyedQuestionSet = {
     key: querySnapshot.id,
     name: querySnapshot.get('name'),
@@ -75,6 +76,23 @@ export async function get_question_set(
     questions: querySnapshot.get('questions')
   };
   return value;
+}
+
+export async function createAnswerDocument(
+  db: Firestore,
+  providerId: string,
+  formId: string,
+  answerMap: { id: string; answer: string }[]
+) {
+  const formsDocument = doc(db, `completedForms/${formId}`);
+  // There are very limited permissions
+  // A user can create a completedForm but cannot update one
+  // Can only create a completedForm for an existing formId
+  setDoc(formsDocument, {
+    providerId: providerId,
+    answerMap: answerMap,
+    timeCompleted: Timestamp.now()
+  });
 }
 
 export async function createCompletedForm(
@@ -85,11 +103,7 @@ export async function createCompletedForm(
   answerMap: { id: string; answer: string }[]
 ) {
   // Create answer document for a complete form
-  const formsDocument = doc(db, `forms/${formId}`);
-  updateDoc(formsDocument, {
-    answerMap: answerMap,
-    timeCompleted: Timestamp.now()
-  });
+  createAnswerDocument(db, providerId, formId, answerMap);
 
   // Create top level reference
   const userDocument = doc(db, `users/${providerId}`);

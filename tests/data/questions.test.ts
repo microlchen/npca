@@ -3,7 +3,7 @@
  */
 import { describe, expect } from '@jest/globals';
 import { Question } from '@/types/questions';
-import { create_question_set } from '@/data/questions';
+import { createQuestionSet } from '@/data/questions';
 import initFirebase from '@/firebase/initFirebase';
 
 describe.only('Test question helper functions', () => {

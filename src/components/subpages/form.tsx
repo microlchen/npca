@@ -22,6 +22,7 @@ export const FormLayout = ({
   subtitle: string;
 }) => {
   const answerMap = new Map<string, string>();
+  console.log(currentQuestionSet);
   answers.forEach((answer) => answerMap.set(answer.id, answer.answer));
   return (
     <Box

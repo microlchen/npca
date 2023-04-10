@@ -1,8 +1,9 @@
 import * as React from 'react';
 import Drawers from '@/components/Charlie/_drawer';
 import {
+  createAnswerDocument,
   createCompletedForm,
-  get_question_set,
+  getQuestionSet,
   getUserForm,
   removeOutstandingForm
 } from '@/data/questions';
@@ -26,13 +27,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
 async function uploadResults(
   db: Firestore,
-  patientId: string,
   providerId: string,
   formId: string,
   answerMap: { id: string; answer: string }[]
 ) {
-  createCompletedForm(db, patientId, providerId, formId, answerMap);
-  removeOutstandingForm(db, patientId, providerId, formId);
+  createAnswerDocument(db, providerId, formId, answerMap);
 }
 
 function PatientForm({
@@ -51,9 +50,11 @@ function PatientForm({
 
   React.useEffect(() => {
     if (currentForm && currentForm.questionId) {
-      get_question_set(db, currentForm.questionId).then((value) =>
-        updateQuestionSet(value)
-      );
+      getQuestionSet(db, currentForm.questionId).then((value) => {
+        if (value !== undefined) {
+          updateQuestionSet(value);
+        }
+      });
     }
   }, [db, currentForm]);
 
@@ -64,13 +65,7 @@ function PatientForm({
     for (const [key, value] of data.entries()) {
       answerMap.push({ id: key, answer: value as string });
     }
-    uploadResults(
-      db,
-      currentForm.patientId,
-      currentForm.providerId,
-      formId,
-      answerMap
-    );
+    uploadResults(db, currentForm.providerId, formId, answerMap);
     router.push('/submit');
   };
 

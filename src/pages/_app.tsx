@@ -3,6 +3,7 @@ import '@/styles/globals.css';
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 import {
   browserSessionPersistence,
+  connectAuthEmulator,
   getAuth,
   initializeAuth
 } from 'firebase/auth';
@@ -14,7 +15,7 @@ import {
 } from 'reactfire';
 import { useEffect } from 'react';
 import nookies from 'nookies';
-import { getFirestore } from 'firebase/firestore';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 
 function CookieSetter({ children }) {
   useEffect(() => {
@@ -34,18 +35,33 @@ function CookieSetter({ children }) {
   return <>{children}</>;
 }
 
-export default function App({ Component, pageProps }) {
-  let app: FirebaseApp;
-  if (!getApps().length) {
-    app = initializeApp(clientCredentials);
-  } else {
-    app = getApp();
+let app: FirebaseApp;
+if (!getApps().length) {
+  app = initializeApp(clientCredentials);
+} else {
+  app = getApp();
+}
+const auth = initializeAuth(app, {
+  persistence: browserSessionPersistence,
+  popupRedirectResolver: undefined
+});
+
+const EMULATORS_STARTED = 'EMULATORS_STARTED';
+
+const storage = getFirestore(app);
+async function setupEmulators(auth) {
+  if (!global[EMULATORS_STARTED]) {
+    global[EMULATORS_STARTED] = true;
+    connectAuthEmulator(auth, 'http://127.0.0.1:9099', {
+      disableWarnings: true
+    });
+    connectFirestoreEmulator(storage, 'localhost', 8080);
   }
-  const storage = getFirestore(app);
-  const auth = initializeAuth(app, {
-    persistence: browserSessionPersistence,
-    popupRedirectResolver: undefined
-  });
+}
+
+setupEmulators(auth);
+
+export default function App({ Component, pageProps }) {
   return (
     <FirebaseAppProvider firebaseApp={app}>
       <FirestoreProvider sdk={storage}>

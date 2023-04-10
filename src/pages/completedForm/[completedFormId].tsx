@@ -1,6 +1,6 @@
 import { FormLayout } from '@/components/subpages/form';
 import Header from '@/components/subpages/header';
-import { getUserForm, get_question_set } from '@/data/questions';
+import { getUserForm, getQuestionSet } from '@/data/questions';
 import { Form } from '@/types/forms';
 import { doc } from '@firebase/firestore';
 import {
@@ -38,7 +38,7 @@ export default function CompletedForm({
 
   useEffect(() => {
     if (currentForm && currentForm.questionId) {
-      get_question_set(db, currentForm.questionId).then((value) =>
+      getQuestionSet(db, currentForm.questionId).then((value) =>
         updateQuestionSet(value)
       );
     }
