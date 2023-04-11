@@ -14,8 +14,8 @@ import {
 import { red } from '@mui/material/colors';
 import Link from 'next/link';
 import Image from 'next/image';
-import useRouter from 'next/router';
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 enum Submitter {
   SignIn,
