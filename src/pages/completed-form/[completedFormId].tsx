@@ -1,7 +1,7 @@
-import { FormLayout } from '@/components/subpages/form';
-import Header from '@/components/subpages/header';
-import { getUserForm, get_question_set } from '@/data/questions';
-import { Form } from '@/types/forms';
+import { FormLayout } from '@/components/subpages/Form';
+import Header from '@/components/subpages/Header';
+import { getUserForm, getQuestionSet } from '@/data/questions';
+import { CompletedForm } from '@/types/forms';
 import { doc } from '@firebase/firestore';
 import {
   GetServerSidePropsContext,
@@ -20,7 +20,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-export default function CompletedForm({
+export default function CompletedFormId({
   formId
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const db = useFirestore();
@@ -32,13 +32,13 @@ export default function CompletedForm({
 
   useEffect(() => {
     getUserForm(db, formId).then((value) =>
-      updateCurrentForm(value.data() as unknown as Form)
+      updateCurrentForm(value.data() as unknown as CompletedForm)
     );
   }, [db, formId]);
 
   useEffect(() => {
     if (currentForm && currentForm.questionId) {
-      get_question_set(db, currentForm.questionId).then((value) =>
+      getQuestionSet(db, currentForm.questionId).then((value) =>
         updateQuestionSet(value)
       );
     }
@@ -47,7 +47,6 @@ export default function CompletedForm({
   useEffect(() => {
     if (status != 'loading') {
       if (data && data.answerMap) {
-        console.log('Got data');
         setAnswerMap(data.answerMap);
       }
     }

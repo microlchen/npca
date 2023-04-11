@@ -7,15 +7,15 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { get_generic_question_types, get_question_set } from '@/data/questions';
+import { getGenericQuestionTypes, getQuestionSet } from '@/data/questions';
 import { KeyedQuestionSet } from '@/types/questions';
 import getFirebaseApp from '@/firebase/initFirebase';
 import { Firestore, getFirestore } from 'firebase/firestore';
 
 async function getPHQ9(db: Firestore): Promise<KeyedQuestionSet> {
-  const types = await get_generic_question_types(db);
+  const types = await getGenericQuestionTypes(db);
   const { id } = types.find((value) => value.name == 'PHQ-9');
-  return get_question_set(db, id);
+  return getQuestionSet(db, id);
 }
 
 export async function getServerSideProps() {

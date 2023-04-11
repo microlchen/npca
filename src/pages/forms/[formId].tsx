@@ -1,18 +1,17 @@
 import * as React from 'react';
 import Drawers from '@/components/Charlie/_drawer';
 import {
-  createCompletedForm,
-  get_question_set,
-  getUserForm,
-  removeOutstandingForm
+  createAnswerDocument,
+  getQuestionSet,
+  getUserForm
 } from '@/data/questions';
-import { Form } from '@/types/questions';
 import { Firestore } from 'firebase/firestore';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useFirestore } from 'reactfire';
-import Header from '@/components/subpages/header';
-import { FormLayout } from '@/components/subpages/form';
+import Header from '@/components/subpages/Header';
 import { useRouter } from 'next/router';
+import { Form } from '@/types/forms';
+import { FormLayout } from '@/components/subpages/Form';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const formId = ctx.params['formId'] as string;
@@ -26,13 +25,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
 async function uploadResults(
   db: Firestore,
-  patientId: string,
   providerId: string,
+  questionId: string,
   formId: string,
   answerMap: { id: string; answer: string }[]
 ) {
-  createCompletedForm(db, patientId, providerId, formId, answerMap);
-  removeOutstandingForm(db, patientId, providerId, formId);
+  createAnswerDocument(db, providerId, questionId, formId, answerMap);
 }
 
 function PatientForm({
@@ -51,9 +49,11 @@ function PatientForm({
 
   React.useEffect(() => {
     if (currentForm && currentForm.questionId) {
-      get_question_set(db, currentForm.questionId).then((value) =>
-        updateQuestionSet(value)
-      );
+      getQuestionSet(db, currentForm.questionId).then((value) => {
+        if (value !== undefined) {
+          updateQuestionSet(value);
+        }
+      });
     }
   }, [db, currentForm]);
 
@@ -66,8 +66,8 @@ function PatientForm({
     }
     uploadResults(
       db,
-      currentForm.patientId,
       currentForm.providerId,
+      currentForm.questionId,
       formId,
       answerMap
     );
