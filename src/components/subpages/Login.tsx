@@ -14,7 +14,7 @@ import {
 import { red } from '@mui/material/colors';
 import Link from 'next/link';
 import Image from 'next/image';
-import router from 'next/router';
+import useRouter from 'next/router';
 import { useCallback, useRef, useState, useEffect } from 'react';
 
 enum Submitter {
@@ -23,9 +23,10 @@ enum Submitter {
 }
 
 export default function Login() {
+  const router = useRouter();
   const onLogin = useCallback(() => {
     router.push('patient-portal');
-  }, []);
+  }, [router]);
 
   const form: React.MutableRefObject<HTMLFormElement> = useRef();
   const checkboxRef: React.MutableRefObject<HTMLInputElement> = useRef();
