@@ -47,7 +47,6 @@ export default function CompletedFormId({
   useEffect(() => {
     if (status != 'loading') {
       if (data && data.answerMap) {
-        console.log('Got data');
         setAnswerMap(data.answerMap);
       }
     }

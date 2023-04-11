@@ -47,7 +47,6 @@ function CompletedForms({
           <Typography variant="h4">Completed Forms</Typography>
           <List>
             {completedForms.map((completedForm) => {
-              console.log('completedform', completedForm);
               return (
                 <Box key={completedForm.id}>
                   <ListItemButton
@@ -151,7 +150,6 @@ function PatientForms({
 
   React.useEffect(() => {
     if (status === 'success') {
-      console.log('got patient forms', data);
       if (data != undefined) {
         if (data.outstandingForms) {
           getForms(db, data.outstandingForms).then((form) =>
@@ -160,7 +158,6 @@ function PatientForms({
         }
         if (data.completedForms) {
           getCompletedForms(db, data.completedForms).then((form) => {
-            console.log('form', form);
             setCompletedForms(form);
           });
         }

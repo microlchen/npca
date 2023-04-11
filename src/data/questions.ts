@@ -51,9 +51,7 @@ export async function getQuestionSet(
 ): Promise<KeyedQuestionSet> {
   const question_collection = collection(db, generic_questions_id);
 
-  console.log(id, question_collection);
   const querySnapshot = await getDoc(doc(question_collection, id));
-  console.log(querySnapshot.data());
   const value: KeyedQuestionSet = {
     key: querySnapshot.id,
     name: querySnapshot.get('name'),

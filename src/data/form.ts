@@ -16,7 +16,6 @@ import { CompletedForm } from '@/types/forms';
 export async function completedFormExists(db: Firestore, formId: string) {
   const completedFormDoc = doc(db, `completedForms/${formId}`);
   const completedForm = await getDoc(completedFormDoc);
-  console.log('form', completedForm);
   return completedForm.exists();
 }
 
@@ -84,7 +83,6 @@ export async function getCompletedForms(
   }
 
   const snapshots = await Promise.all(formSnapshots);
-  console.log('snapshots', snapshots);
   const forms: Promise<CompletedForm>[] = [];
 
   snapshots.forEach((snapshot) => {

@@ -35,7 +35,6 @@ export function subscribeToUser(
 ): Unsubscribe {
   const userCollection = collection(db, 'users');
   const userDocument = doc(userCollection, uid);
-  console.log('onSnapshot', userDocument, uid);
   return onSnapshot(userDocument, subscriber, (error) =>
     console.log('ERROR', error)
   );
