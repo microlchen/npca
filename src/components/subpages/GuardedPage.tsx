@@ -24,10 +24,10 @@ export default function GuardedPage({
   const router = useRouter();
 
   useEffect(() => {
-    if (!inverted === signInCheckResult.signedIn) {
+    if (status === 'success' && !inverted !== signInCheckResult.signedIn) {
       router.push(destination);
     }
-  }, [router, signInCheckResult]);
+  }, [router, status, signInCheckResult, destination, inverted]);
 
   if (status === 'loading') {
     return <Loading />;

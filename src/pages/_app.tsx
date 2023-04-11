@@ -59,7 +59,7 @@ async function setupEmulators(auth) {
   }
 }
 
-if (process.env.NEXT_PUBLIC_DEBUG) {
+if (process.env.NODE_ENV === 'development') {
   setupEmulators(auth);
 }
 
