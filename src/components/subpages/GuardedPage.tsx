@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { useSigninCheck } from 'reactfire';
 
 export function Loading(): JSX.Element {
@@ -22,14 +23,17 @@ export default function GuardedPage({
   const { status, data: signInCheckResult } = useSigninCheck();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!inverted === signInCheckResult.signedIn) {
+      router.push(destination);
+    }
+  }, [router, signInCheckResult]);
+
   if (status === 'loading') {
     return <Loading />;
-  }
-
-  if (!inverted === signInCheckResult.signedIn) {
+  } else if (!inverted === signInCheckResult.signedIn) {
     return children;
   } else {
-    router.push(destination);
     return <Loading />;
   }
 }
