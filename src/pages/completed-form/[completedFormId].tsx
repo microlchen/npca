@@ -20,7 +20,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-export default function CompletedForm({
+export default function CompletedFormId({
   formId
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const db = useFirestore();

@@ -1,13 +1,7 @@
 import { CompletedForm } from '@/types/forms';
-import {
-  KeyedQuestionSet,
-  Question,
-  QuestionSet,
-  QuestionType
-} from '@/types/questions';
+import { KeyedQuestionSet, QuestionSet, QuestionType } from '@/types/questions';
 import {
   addDoc,
-  arrayRemove,
   arrayUnion,
   collection,
   doc,

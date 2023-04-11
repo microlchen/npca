@@ -10,7 +10,7 @@ import {
   setDoc,
   updateDoc
 } from 'firebase/firestore';
-import { createAnswerDocument, getQuestionName } from './questions';
+import { getQuestionName } from './questions';
 import { CompletedForm } from '@/types/forms';
 
 export async function completedFormExists(db: Firestore, formId: string) {

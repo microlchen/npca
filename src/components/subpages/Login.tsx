@@ -25,7 +25,7 @@ enum Submitter {
 export default function Login() {
   const onLogin = useCallback(() => {
     router.push('patient-portal');
-  }, [router]);
+  }, []);
 
   const form: React.MutableRefObject<HTMLFormElement> = useRef();
   const checkboxRef: React.MutableRefObject<HTMLInputElement> = useRef();

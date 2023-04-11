@@ -59,7 +59,9 @@ async function setupEmulators(auth) {
   }
 }
 
-setupEmulators(auth);
+if (process.env.NEXT_PUBLIC_DEBUG) {
+  setupEmulators(auth);
+}
 
 export default function App({ Component, pageProps }) {
   return (

@@ -5,12 +5,7 @@ import { useState } from 'react';
 import { ListItemButton, List, Box, Typography } from '@mui/material/';
 import Header from '@/components/subpages/Header';
 import { Patient } from '@/types/users';
-import {
-  DocumentData,
-  DocumentSnapshot,
-  collection,
-  doc
-} from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import {
   generateQuestionLink,
@@ -188,7 +183,7 @@ function PatientForms({
         }
       });
     });
-  }, [outstandingForms]);
+  }, [db, outstandingForms]);
 
   return (
     <>
