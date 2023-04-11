@@ -3,7 +3,7 @@ import styles from '@/styles/Home.module.css';
 import { useState } from 'react';
 
 import { ListItemButton, List, Box, Typography } from '@mui/material/';
-import Header from '@/components/subpages/header';
+import Header from '@/components/subpages/Header';
 import { Patient } from '@/types/users';
 import {
   DocumentData,
@@ -25,15 +25,24 @@ import {
   useFirestoreDocDataOnce,
   useUser
 } from 'reactfire';
-import { Form } from '@/types/forms';
-import { FormDialog } from '@/components/subpages/formDialog';
+import { CompletedForm } from '@/types/forms';
+import { FormDialog } from '@/components/subpages/FormDialog';
 import GuardedPage, { Loading } from '@/components/subpages/GuardedPage';
-import { subscribeToUser } from '@/data/user';
+import {
+  completedFormExists,
+  generateCompletedFormReferences,
+  getCompletedForms,
+  removeOutstandingForm
+} from '@/data/form';
 
-function CompletedForms({ completedForms }: { completedForms: Form[] }) {
+function CompletedForms({
+  completedForms
+}: {
+  completedForms: CompletedForm[];
+}) {
   const router = useRouter();
   const handleClick = (formId: string) => {
-    router.push(`/completedForm/${formId}`);
+    router.push(`/completed-form/${formId}`);
   };
 
   return (
@@ -42,24 +51,27 @@ function CompletedForms({ completedForms }: { completedForms: Form[] }) {
         <>
           <Typography variant="h4">Completed Forms</Typography>
           <List>
-            {completedForms.map((completedForm) => (
-              <Box key={completedForm.id}>
-                <ListItemButton
-                  sx={{
-                    backgroundColor: '#34497980',
-                    borderRadius: 50,
-                    mt: '1%'
-                  }}
-                  onClick={() => handleClick(completedForm.id)}
-                >
-                  {`${
-                    completedForm.questionName
-                  } form completed ${completedForm.timeCompleted
-                    .toDate()
-                    .toLocaleString()}`}
-                </ListItemButton>
-              </Box>
-            ))}
+            {completedForms.map((completedForm) => {
+              console.log('completedform', completedForm);
+              return (
+                <Box key={completedForm.id}>
+                  <ListItemButton
+                    sx={{
+                      backgroundColor: '#34497980',
+                      borderRadius: 50,
+                      mt: '1%'
+                    }}
+                    onClick={() => handleClick(completedForm.id)}
+                  >
+                    {`${
+                      completedForm.questionName
+                    } form completed ${completedForm.timeCompleted
+                      .toDate()
+                      .toLocaleString()}`}
+                  </ListItemButton>
+                </Box>
+              );
+            })}
           </List>
         </>
       )}
@@ -72,7 +84,7 @@ function OutstandingForms({
   outstandingForms
 }: {
   host: string;
-  outstandingForms: Form[];
+  outstandingForms: CompletedForm[];
 }) {
   const [open, setOpen] = React.useState(false);
   const [formId, setFormId] = useState<string>('');
@@ -134,9 +146,10 @@ function PatientForms({
   userId: string;
 }) {
   const db = useFirestore();
-  const [outstandingForms, setOutstandingForms] = useState([] as Form[]);
-  const [completedForms, setCompletedForms] = useState([] as Form[]);
-  console.log(userId);
+  const [outstandingForms, setOutstandingForms] = useState(
+    [] as CompletedForm[]
+  );
+  const [completedForms, setCompletedForms] = useState([] as CompletedForm[]);
   const { status, data } = useFirestoreDocData(
     doc(db, `users/${userId}/patient_info/${patientId}`)
   );
@@ -151,18 +164,36 @@ function PatientForms({
           );
         }
         if (data.completedForms) {
-          getForms(db, data.completedForms).then((form) =>
-            setCompletedForms(form)
-          );
+          getCompletedForms(db, data.completedForms).then((form) => {
+            console.log('form', form);
+            setCompletedForms(form);
+          });
         }
       }
     }
   }, [db, status, data]);
 
+  // Check for completed forms
+  React.useEffect(() => {
+    outstandingForms.forEach((form) => {
+      completedFormExists(db, form.id).then((exists) => {
+        if (exists) {
+          generateCompletedFormReferences(
+            db,
+            form.patientId,
+            form.providerId,
+            form.id
+          );
+          removeOutstandingForm(db, form.patientId, form.providerId, form.id);
+        }
+      });
+    });
+  }, [outstandingForms]);
+
   return (
     <>
       <OutstandingForms host={host} outstandingForms={outstandingForms} />
-      <Box sx={{ mb: '2%' }}></Box>
+      <Box sx={{ mb: '2%' }} />
       <CompletedForms completedForms={completedForms} />
     </>
   );

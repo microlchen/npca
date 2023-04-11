@@ -4,6 +4,12 @@ export type Form = {
   patientId: string;
   providerId: string;
   questionId: string;
+};
+
+export type CompletedForm = {
+  patientId: string;
+  providerId: string;
+  questionId: string;
   questionName: string | null;
   timeCreated: Timestamp;
   timeCompleted: Timestamp | null;
@@ -11,7 +17,7 @@ export type Form = {
   id: string;
 };
 
-export const getDefaultForm = (): Form => {
+export const getDefaultForm = (): CompletedForm => {
   return {
     patientId: '',
     providerId: '',

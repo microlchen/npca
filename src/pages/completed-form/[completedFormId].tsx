@@ -1,7 +1,7 @@
-import { FormLayout } from '@/components/subpages/form';
-import Header from '@/components/subpages/header';
+import { FormLayout } from '@/components/subpages/Form';
+import Header from '@/components/subpages/Header';
 import { getUserForm, getQuestionSet } from '@/data/questions';
-import { Form } from '@/types/forms';
+import { CompletedForm } from '@/types/forms';
 import { doc } from '@firebase/firestore';
 import {
   GetServerSidePropsContext,
@@ -32,7 +32,7 @@ export default function CompletedForm({
 
   useEffect(() => {
     getUserForm(db, formId).then((value) =>
-      updateCurrentForm(value.data() as unknown as Form)
+      updateCurrentForm(value.data() as unknown as CompletedForm)
     );
   }, [db, formId]);
 

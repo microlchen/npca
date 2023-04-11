@@ -2,13 +2,9 @@ import * as React from 'react';
 import { TextField, Box, ListItemButton } from '@mui/material/';
 import { useEffect, useState } from 'react';
 import styles from '@/styles/Home.module.css';
-import Header from '@/components/subpages/header';
+import Header from '@/components/subpages/Header';
 import { addPatientId, subscribeToUser } from '@/data/user';
-import {
-  DocumentData,
-  DocumentSnapshot,
-  Unsubscribe
-} from 'firebase/firestore';
+import { DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import { createPatient, getPatientsData } from '@/data/patients';
 import NewPatientFormDialog from '@/components/subpages/NewPatient';
 import { KeyedPatient, Patient } from '@/types/users';

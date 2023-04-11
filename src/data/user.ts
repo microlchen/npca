@@ -23,8 +23,8 @@ export async function create_user_set(
   setDoc(doc(userCollection, uid), {
     email: email,
     patients: [],
-    outstanding_forms: [],
-    completed_forms: []
+    outstandingForms: [],
+    completedForms: []
   });
 }
 

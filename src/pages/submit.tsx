@@ -1,4 +1,4 @@
-import Header from '@/components/subpages/header';
+import Header from '@/components/subpages/Header';
 import { Box, Typography } from '@mui/material';
 
 export default function Submission() {

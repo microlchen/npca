@@ -24,7 +24,7 @@ enum Submitter {
 
 export default function Login() {
   const onLogin = useCallback(() => {
-    router.push('patientportal');
+    router.push('patient-portal');
   }, [router]);
 
   const form: React.MutableRefObject<HTMLFormElement> = useRef();

@@ -2,18 +2,16 @@ import * as React from 'react';
 import Drawers from '@/components/Charlie/_drawer';
 import {
   createAnswerDocument,
-  createCompletedForm,
   getQuestionSet,
-  getUserForm,
-  removeOutstandingForm
+  getUserForm
 } from '@/data/questions';
-import { Form } from '@/types/questions';
 import { Firestore } from 'firebase/firestore';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useFirestore } from 'reactfire';
-import Header from '@/components/subpages/header';
-import { FormLayout } from '@/components/subpages/form';
+import Header from '@/components/subpages/Header';
 import { useRouter } from 'next/router';
+import { Form } from '@/types/forms';
+import { FormLayout } from '@/components/subpages/Form';
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const formId = ctx.params['formId'] as string;
@@ -28,10 +26,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 async function uploadResults(
   db: Firestore,
   providerId: string,
+  questionId: string,
   formId: string,
   answerMap: { id: string; answer: string }[]
 ) {
-  createAnswerDocument(db, providerId, formId, answerMap);
+  createAnswerDocument(db, providerId, questionId, formId, answerMap);
 }
 
 function PatientForm({
@@ -65,7 +64,13 @@ function PatientForm({
     for (const [key, value] of data.entries()) {
       answerMap.push({ id: key, answer: value as string });
     }
-    uploadResults(db, currentForm.providerId, formId, answerMap);
+    uploadResults(
+      db,
+      currentForm.providerId,
+      currentForm.questionId,
+      formId,
+      answerMap
+    );
     router.push('/submit');
   };
 

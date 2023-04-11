@@ -1,4 +1,4 @@
-import { Form } from '@/types/forms';
+import { CompletedForm } from '@/types/forms';
 import {
   KeyedQuestionSet,
   Question,
@@ -26,24 +26,15 @@ const generic_questions_id = 'generic_questions';
 
 export async function createQuestionSet(
   db: Firestore,
-  name: string,
-  questions: Question[]
-) {
-  try {
-    const question_collection_index = collection(
-      db,
-      generic_questions_index_id
-    );
-    const { id } = await addDoc(question_collection_index, { name: name });
+  form: QuestionSet
+): Promise<void> {
+  const questionsIndexCollection = collection(db, 'generic_questions_index');
+  const questionsIndexDoc = await addDoc(questionsIndexCollection, {
+    name: form.name
+  });
 
-    const question_collection = collection(db, generic_questions_id);
-    const question_set: QuestionSet = { name: name, questions: questions };
-    setDoc(doc(question_collection, id), question_set, { merge: true });
-    return 0;
-  } catch (error) {
-    console.log(error);
-    return 1;
-  }
+  const questionsCollection = collection(db, 'generic_questions');
+  setDoc(doc(questionsCollection, questionsIndexDoc.id), form);
 }
 
 export async function getGenericQuestionTypes(
@@ -81,6 +72,7 @@ export async function getQuestionSet(
 export async function createAnswerDocument(
   db: Firestore,
   providerId: string,
+  questionId: string,
   formId: string,
   answerMap: { id: string; answer: string }[]
 ) {
@@ -91,64 +83,9 @@ export async function createAnswerDocument(
   setDoc(formsDocument, {
     providerId: providerId,
     answerMap: answerMap,
+    questionId: questionId,
     timeCompleted: Timestamp.now()
   });
-}
-
-export async function createCompletedForm(
-  db: Firestore,
-  patientId: string,
-  providerId: string,
-  formId: string,
-  answerMap: { id: string; answer: string }[]
-) {
-  // Create answer document for a complete form
-  createAnswerDocument(db, providerId, formId, answerMap);
-
-  // Create top level reference
-  const userDocument = doc(db, `users/${providerId}`);
-  updateDoc(userDocument, {
-    completedForms: arrayUnion(formId)
-  });
-
-  // Create patient level reference for the user
-  const patientInfoCollection = collection(userDocument, `patient_info`);
-  const patientInfoDocument = doc(patientInfoCollection, patientId);
-
-  setDoc(
-    patientInfoDocument,
-    { completedForms: arrayUnion(formId) },
-    { merge: true }
-  );
-
-  // Create reference inside patient data
-  const patientDocument = doc(db, `patients/${patientId}`);
-
-  updateDoc(patientDocument, { completedForms: arrayUnion(formId) });
-}
-
-export async function removeOutstandingForm(
-  db: Firestore,
-  patientId: string,
-  providerId: string,
-  formId: string
-) {
-  // Remove top level reference
-  const userDocument = doc(db, `users/${providerId}`);
-  updateDoc(userDocument, {
-    outstandingForms: arrayRemove(formId)
-  });
-
-  // Remove patient level reference
-  const patientInfoCollection = collection(userDocument, `patient_info`);
-  const patientInfoDocument = doc(patientInfoCollection, patientId);
-
-  updateDoc(patientInfoDocument, { outstandingForms: arrayRemove(formId) });
-
-  // Remove reference inside patient data
-  const patientDocument = doc(db, `patients/${patientId}`);
-
-  updateDoc(patientDocument, { outstandingForms: arrayRemove(formId) });
 }
 
 async function createOutstandingForm(
@@ -179,7 +116,10 @@ async function createOutstandingForm(
   updateDoc(patientDocument, { outstandingForms: arrayUnion(formId) });
 }
 
-async function getQuestionName(db: Firestore, id: string): Promise<string> {
+export async function getQuestionName(
+  db: Firestore,
+  id: string
+): Promise<string> {
   const question_collection_index = collection(db, generic_questions_index_id);
   const question = await getDoc(doc(question_collection_index, id));
   return question.data().name;
@@ -188,7 +128,7 @@ async function getQuestionName(db: Firestore, id: string): Promise<string> {
 export async function getForms(
   db: Firestore,
   formIds: string[]
-): Promise<Form[]> {
+): Promise<CompletedForm[]> {
   // Create top level reference
   const userDocument = collection(db, `forms`);
   const formSnapshots: Promise<DocumentSnapshot<DocumentData>>[] = [];
@@ -197,7 +137,7 @@ export async function getForms(
   }
 
   const snapshots = await Promise.all(formSnapshots);
-  const forms: Promise<Form>[] = snapshots.map(async (snapshot) => ({
+  const forms: Promise<CompletedForm>[] = snapshots.map(async (snapshot) => ({
     patientId: snapshot.data().patientId,
     providerId: snapshot.data().providerId,
     questionId: snapshot.data().questionId,

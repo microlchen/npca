@@ -4,7 +4,7 @@ import Login from '@/components/subpages/Login';
 
 export default function Index() {
   return (
-    <GuardedPage inverted={true} destination="patientportal">
+    <GuardedPage inverted={true} destination="patient-portal">
       <Login />
     </GuardedPage>
   );
